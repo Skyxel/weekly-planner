@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <title>Weekly Planner - Web App</title>
+    <title>Weekly planner for school</title>
     <link rel="stylesheet" href="/static/css/styles.css" />
   </head>
   <body>
@@ -13,6 +13,31 @@
           <p class="subtitle">
             Genera orari compatti per professori e classi in pochi step.
           </p>
+        </div>
+        <div class="header-actions">
+          <div class="theme-switcher" role="group" aria-label="Cambia tema">
+            <span class="theme-switcher-label">Tema</span>
+            <div class="mode-toggle theme-toggle">
+              <button
+                type="button"
+                class="mode-btn"
+                id="theme-light"
+                aria-pressed="false"
+              >
+                <span class="icon icon-sun" aria-hidden="true"></span>
+                Chiaro
+              </button>
+              <button
+                type="button"
+                class="mode-btn active"
+                id="theme-dark"
+                aria-pressed="true"
+              >
+                <span class="icon icon-moon" aria-hidden="true"></span>
+                Scuro
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -61,9 +86,24 @@
                   Imposta struttura della settimana, ore mattina/pomeriggio e
                   numero di docenti/classi.
                 </p>
-                <div class="mode-block" style="margin-top: 8px">
-                  <div class="seed-label">Mercoledì con pomeriggio libero</div>
-                  <div class="mode-toggle">
+              </div>
+            </div>
+
+            <div class="fields-grid two-cols">
+              <div class="field toggle-field">
+                <div class="field-toggle-row">
+                  <label class="field-label">
+                    Giorno con pomeriggio libero
+                    <span
+                      class="info-icon"
+                      data-info="Usa questa opzione se vuoi tenere libero il pomeriggio in un giorno a scelta della settimana. Se 'Si' indica anche il numero del giorno con pomeriggio libero."
+                      aria-label="Informazioni su pomeriggio libero"
+                      tabindex="0"
+                    >
+                      i
+                    </span>
+                  </label>
+                  <div class="mode-toggle compact">
                     <button
                       type="button"
                       class="mode-btn"
@@ -83,9 +123,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="fields-grid two-cols">
               <div class="field">
                 <label class="field-label">Giorni alla settimana</label>
                 <input
@@ -102,7 +139,9 @@
               </div>
 
               <div class="field">
-                <label class="field-label">Numero giorno con pomeriggio libero</label>
+                <label class="field-label"
+                  >N° giorno con pomeriggio libero</label
+                >
                 <input
                   class="input"
                   type="number"
@@ -426,7 +465,8 @@
             <div class="sub-card-row">
               <div class="sub-card gen-card">
                 <div class="section-title">
-                  <span class="dot"></span><span>Impostazioni di generazione</span>
+                  <span class="dot"></span
+                  ><span>Impostazioni di generazione</span>
                 </div>
                 <div class="gen-settings-col">
                   <div class="inline-controls">
@@ -500,7 +540,9 @@
                   </button>
                   <div id="loading-bar" class="loading-bar">
                     <div class="loading-bar-inner" id="loading-bar-inner"></div>
-                    <div class="loading-bar-label" id="loading-bar-label">0%</div>
+                    <div class="loading-bar-label" id="loading-bar-label">
+                      0%
+                    </div>
                   </div>
                 </div>
               </div>
@@ -518,7 +560,11 @@
                     <span class="btn-icon">⬇</span>
                     Scarica piano classi
                   </button>
-                  <button class="btn" id="share-link-btn" title="Copia link con dati">
+                  <button
+                    class="btn"
+                    id="share-link-btn"
+                    title="Copia link con dati"
+                  >
                     <span class="btn-icon">🔗</span>
                     Copia link con dati
                   </button>
@@ -594,7 +640,9 @@
     </div>
 
     <div class="bug-link">
-      <a href="mailto:programmi.barbieri@gmail.com?subject=Segnalazione%20Weekly%20Planner">
+      <a
+        href="mailto:programmi.barbieri@gmail.com?subject=Segnalazione%20Weekly%20Planner"
+      >
         Segnala bug o problemi
       </a>
     </div>

@@ -43,6 +43,8 @@ class WeeklyPlannerApp {
     const resetOverlay = document.getElementById("reset-confirm-overlay");
     const resetConfirmBtn = document.getElementById("reset-confirm");
     const resetCancelBtn = document.getElementById("reset-cancel");
+    const themeLightBtn = document.getElementById("theme-light");
+    const themeDarkBtn = document.getElementById("theme-dark");
     const freeAfternoonYesBtn = document.getElementById("free-afternoon-yes");
     const freeAfternoonNoBtn = document.getElementById("free-afternoon-no");
     const freeAfternoonInput = document.getElementById("free_afternoon_day");
@@ -57,6 +59,43 @@ class WeeklyPlannerApp {
     let loadingStart = 0;
     let loadingTarget90 = 0;
     let pendingResetStep = null;
+
+    const THEME_STORAGE_KEY = "weeklyPlannerTheme";
+
+    function applyTheme(next) {
+      const theme = next === "light" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", theme);
+      if (themeLightBtn) {
+        const isLight = theme === "light";
+        themeLightBtn.classList.toggle("active", isLight);
+        themeLightBtn.setAttribute("aria-pressed", isLight ? "true" : "false");
+      }
+      if (themeDarkBtn) {
+        const isDark = theme === "dark";
+        themeDarkBtn.classList.toggle("active", isDark);
+        themeDarkBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
+      }
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+      } catch (e) {
+        // ignore storage issues (private mode, etc.)
+      }
+    }
+
+    function detectInitialTheme() {
+      try {
+        const stored = localStorage.getItem(THEME_STORAGE_KEY);
+        if (stored === "light" || stored === "dark") return stored;
+      } catch (e) {
+        // ignore
+      }
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return "light";
+      }
+      return document.documentElement.getAttribute("data-theme") || "dark";
+    }
+
+    applyTheme(detectInitialTheme());
 
     function openResetConfirm(step) {
       pendingResetStep = step;
@@ -1561,8 +1600,15 @@ class WeeklyPlannerApp {
         {
           label: "Pomeriggio libero",
           value:
-            appState.wedFree && (appState.afternoonHours || 0) > 0
-              ? "Si"
+            appState.freeAfternoonEnabled &&
+            (appState.afternoonHours || 0) > 0 &&
+            appState.freeAfternoonDay
+              ? (() => {
+                  const full = dayLabelAt(appState.freeAfternoonDay - 1) || "";
+                  const short =
+                    full.length >= 3 ? full.slice(0, 3) : full;
+                  return `Si, ${short}`;
+                })()
               : "No",
         },
         { label: "Professori", value: `${appState.numProf}` },
@@ -1585,6 +1631,9 @@ class WeeklyPlannerApp {
     }
 
     // ---- EVENTS -----------------------------------------------------
+    themeLightBtn?.addEventListener("click", () => applyTheme("light"));
+    themeDarkBtn?.addEventListener("click", () => applyTheme("dark"));
+
     freeAfternoonYesBtn?.addEventListener("click", () => {
       setFreeAfternoonEnabled(true);
     });
@@ -2047,6 +2096,37 @@ class WeeklyPlannerApp {
       persistLocal();
       updateUrl();
     }
+
+    function navigateToStep(step) {
+      const target = parseInt(step, 10);
+      if (!target || target < 1 || target > 4 || target === currentStep) return;
+      if (target === 1) {
+        wrappedShowStep(1);
+        return;
+      }
+      if (target === 2) {
+        if (!collectStep1Data()) return;
+        buildHoursTable();
+        wrappedShowStep(2);
+        return;
+      }
+      if (target === 3) {
+        if (!collectStep1Data()) return;
+        buildHoursTable();
+        if (!collectHoursData()) return;
+        buildAvailabilityTable();
+        wrappedShowStep(3);
+        return;
+      }
+      if (target === 4) {
+        if (!collectStep1Data()) return;
+        buildHoursTable();
+        if (!collectHoursData()) return;
+        buildAvailabilityTable();
+        if (!collectAvailabilityData()) return;
+        wrappedShowStep(4);
+      }
+    }
     // Override navigation listeners to use wrappedShowStep
     document.getElementById("to-step-2").onclick = () => {
       if (!collectStep1Data()) return;
@@ -2072,6 +2152,13 @@ class WeeklyPlannerApp {
     document.getElementById("back-to-3").onclick = () => {
       wrappedShowStep(3);
     };
+
+    document.querySelectorAll(".stepper-item").forEach((el) => {
+      el.addEventListener("click", () => {
+        const step = el.getAttribute("data-step");
+        navigateToStep(step);
+      });
+    });
 
     // Matrix & availability live sync already update appState; hook persistence
     const origWireHoursLiveSync = wireHoursLiveSync;
