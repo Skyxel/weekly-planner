@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Weekly Planner - Web App</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="app-header-top">
+        <div>
+          <h1><span class="logo-dot"></span> Weekly Planner</h1>
+          <p class="subtitle">
+            Genera orari compatti per professori e classi in pochi step.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="stepper-item" data-step="1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Dati iniziali</div>
+        </div>
+        <div class="stepper-item" data-step="2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Ore</div>
+        </div>
+        <div class="stepper-item" data-step="3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Disponibilità</div>
+        </div>
+        <div class="stepper-item" data-step="4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Genera piano</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: DATI INIZIALI -->
+      <div class="step-container active" id="step-1">
+        <div class="nav-row top">
+          <div class="nav-row-left"></div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-1">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-2">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <!-- Parametri di base -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Parametri di base</div>
+                <p class="step-card-subtitle">
+                  Imposta struttura della settimana, ore mattina/pomeriggio e
+                  numero di docenti/classi.
+                </p>
+                <div class="toggle-row">
+                  <input type="checkbox" id="free_afternoon_enabled" checked />
+                  <label for="free_afternoon_enabled">
+                    Mercoledi con pomeriggio libero
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="fields-grid">
+              <div class="field">
+                <label class="field-label">Giorni alla settimana</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="days"
+                  value="5"
+                  min="1"
+                  max="7"
+                />
+                <div class="validation-msg" id="val-days">
+                  Deve essere un numero
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label"
+                  >Numero giorno con pomeriggio libero</label
+                >
+                <input
+                  class="input"
+                  type="number"
+                  id="free_afternoon_day"
+                  value="3"
+                  min="1"
+                  max="7"
+                />
+                <div class="validation-msg" id="val-free_afternoon_day">
+                  Deve essere un numero valido (1..giorni)
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">Ore di mattina</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="morning_hours"
+                  value=""
+                  min="1"
+                  max="10"
+                />
+                <div class="validation-msg" id="val-morning_hours">
+                  Deve essere un numero
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">Ore di pomeriggio</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="afternoon_hours"
+                  value=""
+                  min="0"
+                  max="10"
+                />
+                <div class="validation-msg" id="val-afternoon_hours">
+                  Deve essere un numero
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">Numero professori</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="num_professors"
+                  value=""
+                  min="1"
+                  max="30"
+                />
+                <div class="validation-msg" id="val-num_professors">
+                  Deve essere un numero
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">Numero classi</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="num_classes"
+                  value=""
+                  min="1"
+                  max="30"
+                />
+                <div class="validation-msg" id="val-num_classes">
+                  Deve essere un numero
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nomi -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Nomenclatura (opzionale)</div>
+                <p class="step-card-subtitle">
+                  Se lasci vuoto, verranno generati nomi standard. Devono essere
+                  separati da <strong>virgola</strong> e
+                  <strong>esattamente</strong> tanti quanto il numero indicato.
+                </p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Professori</label>
+              <input
+                class="input"
+                type="text"
+                id="professor_names"
+                placeholder="Mario Rossi, Bianchi, ..."
+              />
+              <div
+                class="validation-msg"
+                id="val-professor_names"
+                style="display: none"
+              >
+                I nomi dei professori devono corrispondere al numero indicato.
+              </div>
+            </div>
+
+            <div class="field" style="margin-top: 10px">
+              <label class="field-label">Classi</label>
+              <input
+                class="input"
+                type="text"
+                id="class_names"
+                placeholder="1A, 1B, 2A, ..."
+              />
+              <div
+                class="validation-msg"
+                id="val-class_names"
+                style="display: none"
+              >
+                I nomi delle classi devono corrispondere al numero indicato.
+              </div>
+            </div>
+
+            <div class="field" style="margin-top: 10px">
+              <label class="field-label">Giorni</label>
+              <input
+                class="input"
+                type="text"
+                id="day_names"
+                placeholder="Lunedi, Martedi, Mercoledi, ..."
+              />
+              <div
+                class="validation-msg"
+                id="val-day_names"
+                style="display: none"
+              >
+                I nomi dei giorni devono corrispondere al numero indicato.
+              </div>
+            </div>
+
+            <div class="field" style="margin-top: 10px">
+              <label class="field-label">Ore</label>
+              <input
+                class="input"
+                type="text"
+                id="hour_names"
+                placeholder="8:00, 9:00, 10:00, ..."
+              />
+              <div
+                class="validation-msg"
+                id="val-hour_names"
+                style="display: none"
+              >
+                I nomi delle ore devono corrispondere al numero totale di ore.
+              </div>
+            </div>
+
+            <!-- Navigazione spostata in alto -->
+          </div>
+        </div>
+        <div class="center-row">
+          <button class="btn" id="download-step1-json">
+            <span class="btn-icon">⬇</span>Scarica JSON dati iniziali
+          </button>
+          <button class="btn" id="upload-step1-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON dati iniziali
+          </button>
+          <input
+            type="file"
+            id="upload-step1-json"
+            accept="application/json"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- STEP 2: ORE -->
+      <div class="step-container" id="step-2">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-1">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-2">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-3">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <!-- Matrice ore H -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">
+                  Ore settimanali per prof / classe
+                </div>
+                <p class="step-card-subtitle">
+                  Indica quante ore ogni professore ha con ciascuna classe
+                  nell'arco della settimana. Lascia <strong>0</strong> se un
+                  professore non ha quella classe.
+                </p>
+              </div>
+            </div>
+
+            <div id="matrix-container"></div>
+          </div>
+        </div>
+
+        <!-- Bottoni JSON centrati sotto le due card -->
+        <div class="center-row">
+          <button class="btn" id="download-step2-json">
+            <span class="btn-icon">⬇</span>Scarica JSON ore
+          </button>
+          <button class="btn" id="upload-step2-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON ore
+          </button>
+          <input
+            type="file"
+            id="upload-step2-json"
+            accept="application/json"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- STEP 3: DISPONIBILITÀ -->
+      <div class="step-container" id="step-3">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-2">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-3">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-4">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Disponibilità dei professori</div>
+                <p class="step-card-subtitle">
+                  Se non modifichi nulla, si assume che siano sempre
+                  disponibili. Deseleziona i periodi in cui un docente non
+                  lavora.
+                </p>
+              </div>
+            </div>
+
+            <div id="availability-container"></div>
+          </div>
+        </div>
+        <div class="center-row">
+          <button class="btn" id="download-step3-json">
+            <span class="btn-icon">⬇</span>Scarica JSON disponibilità
+          </button>
+          <button class="btn" id="upload-step3-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON disponibilità
+          </button>
+          <input
+            type="file"
+            id="upload-step3-json"
+            accept="application/json"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- STEP 4: GENERA PIANO -->
+      <div class="step-container" id="step-4">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-3">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-4">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right"></div>
+        </div>
+        <div class="step-grid">
+          <div class="step-card" style="grid-column: 1 / -1">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Genera e confronta i piani</div>
+                <p class="step-card-subtitle">
+                  Crea il piano e visualizza l'anteprima per professori e
+                  classi.
+                </p>
+              </div>
+            </div>
+
+            <div class="sub-card">
+              <div class="section-title">
+                <span class="dot"></span><span>Dati correnti</span>
+              </div>
+              <div id="params-summary" class="params-summary"></div>
+            </div>
+
+            <div class="sub-card-row">
+              <div class="sub-card gen-card">
+                <div class="section-title">
+                  <span class="dot"></span><span>Impostazioni di generazione</span>
+                </div>
+                <div class="gen-settings-col">
+                  <div class="inline-controls">
+                    <div class="mode-block">
+                      <div class="seed-label">
+                        Modalità
+                        <span
+                          class="info-icon"
+                          data-info="Buona: più veloce, soluzione valida ma non ottimale. Ottimale: più lento, cerca la soluzione migliore usando il risolutore MIP."
+                          aria-label="Informazioni sulla modalità"
+                          tabindex="0"
+                        >
+                          i
+                        </span>
+                      </div>
+                      <div class="mode-toggle">
+                        <button
+                          type="button"
+                          class="mode-btn"
+                          id="mode-random"
+                          aria-pressed="false"
+                        >
+                          Buona
+                        </button>
+                        <button
+                          type="button"
+                          class="mode-btn"
+                          id="mode-mip"
+                          aria-pressed="true"
+                        >
+                          Ottimale
+                        </button>
+                      </div>
+                    </div>
+                    <div class="seed-block">
+                      <div class="seed-label">
+                        Codice
+                        <span
+                          class="info-icon"
+                          data-info="Il codice controlla la casualità. Se il lucchetto è chiuso, il numero inserito (0-9.999.999) viene riutilizzato. Se è aperto, ad ogni generazione viene creato un codice casuale e mostrato qui."
+                          aria-label="Informazioni sul codice"
+                          tabindex="0"
+                        >
+                          i
+                        </span>
+                      </div>
+                      <div class="seed-control-row">
+                        <input
+                          class="input seed-input"
+                          type="number"
+                          id="seed-value"
+                          min="0"
+                          max="9999999"
+                          placeholder="auto"
+                        />
+                        <button
+                          class="seed-lock"
+                          id="seed-lock"
+                          type="button"
+                          aria-pressed="false"
+                          aria-label="Blocca codice"
+                        >
+                          🔓
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary" id="generate-plan-btn">
+                    <span class="btn-icon">⚙</span>
+                    Genera piano
+                  </button>
+                  <div id="loading-bar" class="loading-bar">
+                    <div class="loading-bar-inner" id="loading-bar-inner"></div>
+                    <div class="loading-bar-label" id="loading-bar-label">0%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sub-card save-card">
+                <div class="section-title">
+                  <span class="dot"></span><span>Salva</span>
+                </div>
+                <div class="save-actions">
+                  <button class="btn" id="download-professors-pdf-btn">
+                    <span class="btn-icon">⬇</span>
+                    Scarica piano professori
+                  </button>
+                  <button class="btn" id="download-classes-pdf-btn">
+                    <span class="btn-icon">⬇</span>
+                    Scarica piano classi
+                  </button>
+                  <button class="btn" id="share-link-btn" title="Copia link con dati">
+                    <span class="btn-icon">🔗</span>
+                    Copia link con dati
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="error-message"
+              class="alert-text"
+              style="display: none"
+            ></div>
+
+            <div class="preview-layout" style="margin-top: 12px">
+              <!-- Preview professori -->
+              <div>
+                <div class="preview-column-title">
+                  <span class="dot"></span>
+                  <span>Orari per professore</span>
+                </div>
+                <div class="preview-scroller" id="preview-professors">
+                  <div class="preview-card">
+                    <div class="preview-card-header">
+                      <div class="preview-card-title">
+                        Nessun piano ancora generato
+                      </div>
+                    </div>
+                    <div class="preview-card-sub">
+                      Premi <strong>“Genera piano”</strong> per vedere qui i
+                      dettagli per ogni docente.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Preview classi -->
+              <div>
+                <div class="preview-column-title">
+                  <span class="dot"></span>
+                  <span>Orari per classe</span>
+                </div>
+                <div class="preview-scroller" id="preview-classes">
+                  <div class="preview-card">
+                    <div class="preview-card-header">
+                      <div class="preview-card-title">
+                        Nessun piano ancora generato
+                      </div>
+                    </div>
+                    <div class="preview-card-sub">
+                      Dopo la generazione, qui troverai gli orari dettagliati
+                      per ogni classe.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navigazione spostata in alto -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Banner conferma reset -->
+    <div id="reset-confirm-overlay" role="dialog" aria-modal="true">
+      <div class="reset-confirm-card" role="document">
+        <div class="reset-confirm-title">Confermi il reset della pagina?</div>
+        <div class="reset-confirm-text">
+          Questa operazione cancellerà i dati inseriti nello step corrente.
+        </div>
+        <div class="reset-confirm-actions">
+          <button id="reset-cancel" class="btn btn-ghost">Annulla</button>
+          <button id="reset-confirm" class="btn btn-reset">Resetta</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
