@@ -827,9 +827,9 @@ class WeeklyPlannerApp {
       return true;
     }
 
-    // Metodo fissato a 'random'
-    function setMethod() {
-      appState.method = "mip";
+    // Metodo predefinito: ottimale (mip)
+    function setMethod(method = "mip") {
+      appState.method = method || "mip";
       updateModeUI();
     }
 
@@ -1746,7 +1746,7 @@ class WeeklyPlannerApp {
           </div>
           <div class="preview-card-sub">Dopo la generazione, qui troverai gli orari dettagliati per ogni classe.</div>
         </div>`;
-      setMethod("random");
+      setMethod("mip");
       renderStep3Summary();
     }
 
@@ -1884,7 +1884,7 @@ class WeeklyPlannerApp {
 
     // init
     updateStepperUI();
-    setMethod();
+    setMethod("mip");
     wireStep1Validation();
     applySeedUI();
     applyFreeAfternoonUI();
