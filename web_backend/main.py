@@ -1,6 +1,7 @@
 # web_backend/main.py
 
 from typing import List, Optional
+import random
 
 import numpy as np
 from fastapi import FastAPI, Request
@@ -9,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from weekly_planner.models import PlannerConfig
+from weekly_planner.models import PlanResult, PlannerConfig
 from weekly_planner.planner import WeeklyPlanner
 from weekly_planner.mip_planner import MIPWeeklyPlanner
 from weekly_planner.pdf_export import render_classes_pdf, render_professors_pdf
@@ -41,6 +42,8 @@ class PlannerRequest(BaseModel):
     method: str = "mip"
     hour_names: Optional[List[str]] = None
     seed: Optional[int] = None
+    # Piano già generato da riutilizzare per i PDF (shape: days x daily_hours x num_classes)
+    plan: Optional[List[List[List[int]]]] = None
 
 
 def build_config_from_request(req: PlannerRequest) -> PlannerConfig:
@@ -99,14 +102,36 @@ def generate_with_method(config: PlannerConfig, method: str):
     method = (method or "mip").lower()
     if method == "random":
         planner = WeeklyPlanner(config)
-        return planner.generate_plans_basic(
-            num_variants=10,
+        if hasattr(config, "seed") and config.seed is not None:
+            np.random.seed(config.seed)
+            random.seed(config.seed)
+        # Continua finché lo score è adeguato o si esauriscono 10 secondi
+        return planner.generate_until_time(
+            target_score=0.1,
+            time_limit_sec=10.0,
             show_progress=False,
-            seed=config.seed if hasattr(config, "seed") else None,
         )
     else:
         planner = MIPWeeklyPlanner(config)
         return planner.solve(time_limit_sec=60)
+
+
+def get_or_generate_result(req: PlannerRequest, config: PlannerConfig) -> PlanResult:
+    """
+    Se la richiesta include già un piano (req.plan), lo usa direttamente
+    evitando di rigenerare. Altrimenti lancia il planner.
+    """
+    if req.plan is None:
+        return generate_with_method(config, req.method)
+
+    P = np.array(req.plan, dtype=int)
+    expected_shape = (config.days, config.daily_hours, config.num_classes)
+    if P.shape != expected_shape:
+        raise ValueError(
+            f"Shape di plan errata: atteso {expected_shape}, trovato {P.shape}"
+        )
+
+    return PlanResult(plans=[P], scores=[0.0])
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -168,7 +193,13 @@ async def classes_pdf(req: PlannerRequest):
             "message": "Parametri non validi per generare il PDF.",
             "errors": validation_errors,
         }
-    result = generate_with_method(config, req.method)
+    try:
+        result = get_or_generate_result(req, config)
+    except ValueError as e:
+        return {
+            "ok": False,
+            "message": str(e),
+        }
 
     if not result.plans:
         return {
@@ -198,7 +229,13 @@ async def professors_pdf(req: PlannerRequest):
             "message": "Parametri non validi per generare il PDF.",
             "errors": validation_errors,
         }
-    result = generate_with_method(config, req.method)
+    try:
+        result = get_or_generate_result(req, config)
+    except ValueError as e:
+        return {
+            "ok": False,
+            "message": str(e),
+        }
 
     if not result.plans:
         return {
