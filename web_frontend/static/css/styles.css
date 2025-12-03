@@ -1040,14 +1040,25 @@ button,
   user-select: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   body {
-    padding: 20px 14px 30px;
+    padding: 18px 14px 26px;
+    line-height: 1.6;
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 17px;
   }
 
   .app-header-top {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
 
   .header-actions {
@@ -1055,9 +1066,67 @@ button,
     justify-content: flex-start;
   }
 
+  .theme-switcher,
+  .mode-toggle {
+    width: 100%;
+  }
+
+  .mode-btn {
+    font-size: 17px;
+  }
+
+  .stepper {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+  }
+
+  .step-label {
+    font-size: 16px;
+  }
+
+  .step-circle {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .step-card {
+    padding: 18px;
+  }
+
+  .step-card-title {
+    font-size: 19px;
+  }
+
+  .step-card-subtitle {
+    font-size: 15px;
+  }
+
+  .nav-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
   .nav-row-right,
   .nav-row-left {
     min-width: auto;
+    width: 100%;
+  }
+
+  .nav-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn {
+    font-size: 18px;
+    padding: 14px 15px;
+  }
+
+  .input {
+    font-size: 18px;
+    padding: 14px 12px;
   }
 
   .step-grid,
@@ -1065,7 +1134,17 @@ button,
     grid-template-columns: 1fr;
   }
 
+  .fields-grid,
   .fields-grid.two-cols {
     grid-template-columns: 1fr;
+  }
+
+  .field-label {
+    font-size: 16px;
+  }
+
+  .field-hint,
+  .validation-msg {
+    font-size: 15px;
   }
 }
