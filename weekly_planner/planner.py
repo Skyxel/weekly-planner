@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import List
 import random
+import time
 
 import numpy as np
 
@@ -342,3 +343,40 @@ class WeeklyPlanner:
         scores_sorted = [float(scores[i]) for i in order]
 
         return PlanResult(plans=plans_sorted, scores=scores_sorted)
+
+    def generate_until_time(
+        self,
+        target_score: float = 0.1,
+        time_limit_sec: float = 10.0,
+        show_progress: bool = False,
+    ) -> PlanResult:
+        """
+        Tenta piani random finché non trova uno score abbastanza buono
+        o fino a time_limit_sec. Ritorna sempre il migliore trovato.
+        """
+        start = time.perf_counter()
+        best_plan: np.ndarray | None = None
+        best_score: float = float("inf")
+        attempts = 0
+
+        while time.perf_counter() - start < time_limit_sec:
+            attempts += 1
+            P = self._generate_single_plan_basic()
+            if P is None:
+                continue
+            if not self._control(P, show_error=False):
+                continue
+
+            score = self._optimization_value(P)
+            if score < best_score:
+                best_score = score
+                best_plan = P
+                if show_progress:
+                    print(f"[random] nuovo best score {best_score:.4f} (tentativo {attempts})")
+                if best_score <= target_score:
+                    break
+
+        if best_plan is None:
+            return PlanResult(plans=[], scores=[])
+
+        return PlanResult(plans=[best_plan], scores=[best_score])

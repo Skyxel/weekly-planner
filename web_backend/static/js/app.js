@@ -1,28 +1,31 @@
 class WeeklyPlannerApp {
   init() {
     // ---- STATE ------------------------------------------------------
-    const appState = {
-      days: null,
-      morningHours: null,
-      afternoonHours: null,
-      dailyHours: null,
-      lastMorningHour: null,
-      numProf: null,
-      numClass: null,
-      wedFree: true,
-      dayNames: [],
-      freeAfternoonDay: 3,
-      seedEnabled: false,
-      seed: null,
-      professorNames: [],
-      classNames: [],
-      hourNames: [],
-      hoursMatrix: null,
-      availability: null,
-      method: "mip",
-      lastPlanResponse: null,
-      lastPayload: null,
-    };
+    const appState = {};
+    function resetAppState() {
+      appState.days = null;
+      appState.morningHours = null;
+      appState.afternoonHours = null;
+      appState.dailyHours = null;
+      appState.lastMorningHour = null;
+      appState.numProf = null;
+      appState.numClass = null;
+      appState.freeAfternoonEnabled = true;
+      appState.wedFree = true;
+      appState.dayNames = [];
+      appState.freeAfternoonDay = 3;
+      appState.seedEnabled = false;
+      appState.seed = null;
+      appState.professorNames = [];
+      appState.classNames = [];
+      appState.hourNames = [];
+      appState.hoursMatrix = null;
+      appState.availability = null;
+      appState.method = "mip";
+      appState.lastPlanResponse = null;
+      appState.lastPayload = null;
+    }
+    resetAppState();
 
     let currentStep = 1;
 
@@ -40,6 +43,9 @@ class WeeklyPlannerApp {
     const resetOverlay = document.getElementById("reset-confirm-overlay");
     const resetConfirmBtn = document.getElementById("reset-confirm");
     const resetCancelBtn = document.getElementById("reset-cancel");
+    const freeAfternoonYesBtn = document.getElementById("free-afternoon-yes");
+    const freeAfternoonNoBtn = document.getElementById("free-afternoon-no");
+    const freeAfternoonInput = document.getElementById("free_afternoon_day");
     const seedLockBtn = document.getElementById("seed-lock");
     const seedInput = document.getElementById("seed-value");
     const modeRandomBtn = document.getElementById("mode-random");
@@ -100,6 +106,43 @@ class WeeklyPlannerApp {
       return Math.max(0, Math.min(9_999_999, n));
     }
 
+    function applyFreeAfternoonUI() {
+      const enabled = appState.freeAfternoonEnabled !== false;
+      if (freeAfternoonInput) {
+        freeAfternoonInput.disabled = !enabled;
+        freeAfternoonInput.classList.toggle("locked", !enabled);
+        if (!enabled) {
+          freeAfternoonInput.value = "";
+          setFieldInvalid("free_afternoon_day", false);
+          appState.freeAfternoonDay = null;
+          appState.wedFree = false;
+        } else if (!freeAfternoonInput.value) {
+          appState.freeAfternoonDay = appState.freeAfternoonDay || 3;
+          appState.wedFree = appState.freeAfternoonDay === 3;
+          freeAfternoonInput.value = appState.freeAfternoonDay;
+        } else {
+          const val = parseInt(freeAfternoonInput.value, 10);
+          if (!isNaN(val)) {
+            appState.freeAfternoonDay = val;
+            appState.wedFree = val === 3;
+          }
+        }
+      }
+      if (freeAfternoonYesBtn) {
+        freeAfternoonYesBtn.classList.toggle("active", enabled);
+        freeAfternoonYesBtn.setAttribute("aria-pressed", enabled ? "true" : "false");
+      }
+      if (freeAfternoonNoBtn) {
+        freeAfternoonNoBtn.classList.toggle("active", !enabled);
+        freeAfternoonNoBtn.setAttribute("aria-pressed", !enabled ? "true" : "false");
+      }
+    }
+
+    function setFreeAfternoonEnabled(flag) {
+      appState.freeAfternoonEnabled = !!flag;
+      applyFreeAfternoonUI();
+    }
+
     function applySeedUI() {
       const locked = !!appState.seedEnabled;
       if (seedInput) {
@@ -130,6 +173,10 @@ class WeeklyPlannerApp {
         if (!el) return;
         ["input", "blur"].forEach((ev) =>
           el.addEventListener(ev, () => {
+            if (f.id === "free_afternoon_day" && appState.freeAfternoonEnabled === false) {
+              setFieldInvalid("free_afternoon_day", false);
+              return;
+            }
             const max =
               f.id === "free_afternoon_day"
                 ? parseInt(document.getElementById("days").value, 10) ||
@@ -196,10 +243,10 @@ class WeeklyPlannerApp {
         document.getElementById("num_classes").value,
         10
       );
-      const freeAfternoonDay = parseInt(
-        document.getElementById("free_afternoon_day").value,
-        10
-      );
+      const freeAfternoonEnabled = appState.freeAfternoonEnabled !== false;
+      const freeAfternoonDay = freeAfternoonEnabled
+        ? parseInt(document.getElementById("free_afternoon_day").value, 10)
+        : null;
 
       const dailyHours =
         (isNaN(morningHours) ? 0 : morningHours) +
@@ -306,17 +353,23 @@ class WeeklyPlannerApp {
         setFieldInvalid("hour_names", false);
       }
 
-      if (
-        isNaN(freeAfternoonDay) ||
-        freeAfternoonDay < 1 ||
-        freeAfternoonDay > days
-      ) {
-        setFieldInvalid("free_afternoon_day", true);
-        return false;
+      if (freeAfternoonEnabled) {
+        if (
+          isNaN(freeAfternoonDay) ||
+          freeAfternoonDay < 1 ||
+          freeAfternoonDay > days
+        ) {
+          setFieldInvalid("free_afternoon_day", true);
+          return false;
+        }
+        appState.freeAfternoonDay = freeAfternoonDay;
+        appState.wedFree = freeAfternoonDay === 3; // retrocompatibilità
+      } else {
+        setFieldInvalid("free_afternoon_day", false);
+        appState.freeAfternoonDay = null;
+        appState.wedFree = false;
       }
-
-      appState.freeAfternoonDay = freeAfternoonDay;
-      appState.wedFree = freeAfternoonDay === 3; // retrocompatibilità
+      appState.freeAfternoonEnabled = freeAfternoonEnabled;
       appState.dayNames = dayNames;
       appState.professorNames = professorNames;
       appState.classNames = classNames;
@@ -770,11 +823,10 @@ class WeeklyPlannerApp {
           totals.reduce((s, v) => s + v, 0) / (totals.length || 1);
       }
 
-      const complexity = (d / 2.5) * (h / 5) * p * c * (1 + avgHoursPerProf);
+      const complexity = (d / 2.5) * (h / 5) * (p**2) * (c**2) * (1 + avgHoursPerProf);
       // Stimatore: per MIP aumenta con dimensione e si rallenta se disponibilità è scarsa
-      const base = appState.method === "mip" ? 4000 : 900;
-      const factor = appState.method === "mip" ? 10 : 0.04;
-      const estimate = base + complexity * factor;
+      const factor = appState.method === "mip" ? 0.5 : 0.01;
+      const estimate = complexity * factor;
       return estimate;
     }
 
@@ -786,7 +838,8 @@ class WeeklyPlannerApp {
         if (loadingBarInner) loadingBarInner.style.width = progress + "%";
         if (loadingBarLabel) loadingBarLabel.textContent = Math.round(progress) + "%";
       };
-      const totalMs = estimateWorkMs();
+      // Usa lo stimatore solo per MIP, altrimenti barra fissa a 10 secondi
+      const totalMs = appState.method === "mip" ? estimateWorkMs() : 10000;
       loadingStart = Date.now();
       loadingTarget90 = Math.max(800, totalMs * 0.85);
       setProgress(appState.method === "mip" ? 4 : 6);
@@ -905,16 +958,21 @@ class WeeklyPlannerApp {
     }
 
     async function downloadPdf(endpoint, filename) {
-      if (!appState.lastPayload) {
+      if (!appState.lastPayload || !appState.lastPlanResponse?.plan) {
         alert("Prima genera almeno un piano (clicca su “Genera piano”).");
         return;
       }
+
+      const payloadWithPlan = {
+        ...appState.lastPayload,
+        plan: appState.lastPlanResponse.plan,
+      };
 
       try {
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(appState.lastPayload),
+          body: JSON.stringify(payloadWithPlan),
         });
 
         if (!res.ok) {
@@ -977,9 +1035,10 @@ class WeeklyPlannerApp {
         parseInt(document.getElementById("num_professors").value, 10) || 0;
       const num_classes =
         parseInt(document.getElementById("num_classes").value, 10) || 0;
-      const free_afternoon_day =
-        parseInt(document.getElementById("free_afternoon_day").value, 10) ||
-        0;
+      const free_afternoon_enabled = appState.freeAfternoonEnabled !== false;
+      const free_afternoon_day = free_afternoon_enabled
+        ? parseInt(document.getElementById("free_afternoon_day").value, 10) || 0
+        : null;
 
       const profNamesStr = (
         document.getElementById("professor_names").value || ""
@@ -1024,8 +1083,10 @@ class WeeklyPlannerApp {
         afternoon_hours,
         num_professors,
         num_classes,
-        wednesday_afternoon_free: free_afternoon_day === 3,
+        wednesday_afternoon_free:
+          free_afternoon_enabled && free_afternoon_day === 3,
         free_afternoon_day,
+        free_afternoon_enabled,
         professor_names,
         class_names,
         day_names,
@@ -1066,12 +1127,27 @@ class WeeklyPlannerApp {
       // Aggiorna stato locale coerente con i nuovi campi
       const daysVal =
         parseInt(document.getElementById("days").value, 10) || 0;
-      const fadVal =
-        parseInt(document.getElementById("free_afternoon_day").value, 10) ||
-        0;
-      appState.freeAfternoonDay =
-        fadVal >= 1 && fadVal <= daysVal ? fadVal : 3;
-      appState.wedFree = appState.freeAfternoonDay === 3;
+      const loadedEnabled =
+        obj.free_afternoon_enabled !== false &&
+        (obj.wednesday_afternoon_free !== false || obj.free_afternoon_day);
+      appState.freeAfternoonEnabled = loadedEnabled;
+      if (loadedEnabled) {
+        const fadVal =
+          parseInt(document.getElementById("free_afternoon_day").value, 10) ||
+          0;
+        appState.freeAfternoonDay =
+          fadVal >= 1 && fadVal <= daysVal ? fadVal : 3;
+        if (!document.getElementById("free_afternoon_day").value) {
+          document.getElementById("free_afternoon_day").value =
+            appState.freeAfternoonDay;
+        }
+        appState.wedFree = appState.freeAfternoonDay === 3;
+      } else {
+        if (freeAfternoonInput) freeAfternoonInput.value = "";
+        appState.freeAfternoonDay = null;
+        appState.wedFree = false;
+      }
+      applyFreeAfternoonUI();
       const dayNamesStr = (
         document.getElementById("day_names").value || ""
       ).trim();
@@ -1509,6 +1585,14 @@ class WeeklyPlannerApp {
     }
 
     // ---- EVENTS -----------------------------------------------------
+    freeAfternoonYesBtn?.addEventListener("click", () => {
+      setFreeAfternoonEnabled(true);
+    });
+
+    freeAfternoonNoBtn?.addEventListener("click", () => {
+      setFreeAfternoonEnabled(false);
+    });
+
     document.getElementById("to-step-2").addEventListener("click", () => {
       if (!collectStep1Data()) return;
       buildHoursTable();
@@ -1552,6 +1636,9 @@ class WeeklyPlannerApp {
       if (hourNamesEl) hourNamesEl.value = "";
       const fadEl = document.getElementById("free_afternoon_day");
       if (fadEl) fadEl.value = 3;
+      appState.freeAfternoonEnabled = true;
+      appState.freeAfternoonDay = 3;
+      appState.wedFree = true;
       document.getElementById("professor_names").value = "";
       document.getElementById("class_names").value = "";
       [
@@ -1562,6 +1649,7 @@ class WeeklyPlannerApp {
         "num_classes",
         "free_afternoon_day",
       ].forEach((id) => setFieldInvalid(id, false));
+      applyFreeAfternoonUI();
     }
 
     function resetStep2() {
@@ -1750,9 +1838,18 @@ class WeeklyPlannerApp {
     setMethod();
     wireStep1Validation();
     applySeedUI();
+    applyFreeAfternoonUI();
 
     // ---- PERSISTENZA & CONDIVISIONE ---------------------------------
     const LS_KEY = "weeklyPlannerStateV1";
+
+    function clearLocalState() {
+      try {
+        localStorage.removeItem(LS_KEY);
+      } catch (e) {
+        // Ignora eventuali errori (es. private mode)
+      }
+    }
 
     function serializeState() {
       return {
@@ -1896,10 +1993,12 @@ class WeeklyPlannerApp {
       showStep(stepToShow);
     }
 
-    // Attempt hydrate from URL hash first, otherwise from localStorage
+    // Hydrate solo da hash condiviso; l'URL base parte sempre pulito
     (function initPersistence() {
+      const hasStateHash = location.hash.startsWith("#state=");
       let hydrated = false;
-      if (location.hash.startsWith("#state=")) {
+
+      if (hasStateHash) {
         const enc = location.hash.slice("#state=".length);
         const obj = decodeStateFromUrl(enc);
         if (obj) {
@@ -1907,12 +2006,17 @@ class WeeklyPlannerApp {
           hydrated = true;
         }
       }
+
+      // Se l'URL è quello base (senza stato condiviso) riparti da zero e ripulisci hash/LS
       if (!hydrated) {
-        const saved = loadLocal();
-        if (saved) {
-          hydrateState(saved);
-        }
+        clearLocalState();
+        resetAppState();
+        history.replaceState(null, "", location.pathname);
+        resetStep1();
+        resetStep4();
+        showStep(1);
       }
+
       updateModeUI();
     })();
 

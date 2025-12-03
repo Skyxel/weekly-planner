@@ -61,16 +61,31 @@
                   Imposta struttura della settimana, ore mattina/pomeriggio e
                   numero di docenti/classi.
                 </p>
-                <div class="toggle-row">
-                  <input type="checkbox" id="free_afternoon_enabled" checked />
-                  <label for="free_afternoon_enabled">
-                    Mercoledi con pomeriggio libero
-                  </label>
+                <div class="mode-block" style="margin-top: 8px">
+                  <div class="seed-label">Mercoledì con pomeriggio libero</div>
+                  <div class="mode-toggle">
+                    <button
+                      type="button"
+                      class="mode-btn"
+                      id="free-afternoon-yes"
+                      aria-pressed="true"
+                    >
+                      Si
+                    </button>
+                    <button
+                      type="button"
+                      class="mode-btn"
+                      id="free-afternoon-no"
+                      aria-pressed="false"
+                    >
+                      No
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="fields-grid">
+            <div class="fields-grid two-cols">
               <div class="field">
                 <label class="field-label">Giorni alla settimana</label>
                 <input
@@ -87,9 +102,7 @@
               </div>
 
               <div class="field">
-                <label class="field-label"
-                  >Numero giorno con pomeriggio libero</label
-                >
+                <label class="field-label">Numero giorno con pomeriggio libero</label>
                 <input
                   class="input"
                   type="number"
@@ -300,7 +313,9 @@
               </div>
             </div>
 
-            <div id="matrix-container"></div>
+            <div class="table-scroller">
+              <div id="matrix-container"></div>
+            </div>
           </div>
         </div>
 
@@ -353,7 +368,9 @@
               </div>
             </div>
 
-            <div id="availability-container"></div>
+            <div class="table-scroller">
+              <div id="availability-container"></div>
+            </div>
           </div>
         </div>
         <div class="center-row">
@@ -515,12 +532,11 @@
               style="display: none"
             ></div>
 
-            <div class="preview-layout" style="margin-top: 12px">
+            <div class="preview-layout">
               <!-- Preview professori -->
-              <div>
-                <div class="preview-column-title">
-                  <span class="dot"></span>
-                  <span>Orari per professore</span>
+              <div class="sub-card preview-panel">
+                <div class="section-title">
+                  <span class="dot"></span><span>Orari per professore</span>
                 </div>
                 <div class="preview-scroller" id="preview-professors">
                   <div class="preview-card">
@@ -538,10 +554,9 @@
               </div>
 
               <!-- Preview classi -->
-              <div>
-                <div class="preview-column-title">
-                  <span class="dot"></span>
-                  <span>Orari per classe</span>
+              <div class="sub-card preview-panel">
+                <div class="section-title">
+                  <span class="dot"></span><span>Orari per classe</span>
                 </div>
                 <div class="preview-scroller" id="preview-classes">
                   <div class="preview-card">
@@ -578,6 +593,12 @@
       </div>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <div class="bug-link">
+      <a href="mailto:programmi.barbieri@gmail.com?subject=Segnalazione%20Weekly%20Planner">
+        Segnala bug o problemi
+      </a>
+    </div>
+
+    <script src="/static/js/app.js?v=2"></script>
   </body>
 </html>
