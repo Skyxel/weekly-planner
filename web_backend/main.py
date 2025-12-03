@@ -2,6 +2,7 @@
 
 from typing import List, Optional
 import random
+from pathlib import Path
 
 import numpy as np
 from fastapi import FastAPI, Request
@@ -17,11 +18,16 @@ from weekly_planner.pdf_export import render_classes_pdf, render_professors_pdf
 from weekly_planner.validation import validate_config
 
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "web_frontend"
+TEMPLATES_DIR = FRONTEND_DIR / "templates"
+STATIC_DIR = FRONTEND_DIR / "static"
+
 app = FastAPI()
-templates = Jinja2Templates(directory="web_backend/templates")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # Serve file statici (CSS/JS) da /static
-app.mount("/static", StaticFiles(directory="web_backend/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 class PlannerRequest(BaseModel):
