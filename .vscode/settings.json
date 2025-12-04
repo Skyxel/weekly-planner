@@ -30,6 +30,6 @@
         "venv.bak{,/**}",
         ".vscode{,/**}"
     ],
-    "appService.defaultWebAppToDeploy": "/subscriptions/cad07870-a94d-4361-bbf4-1bf728e55c3b/resourceGroups/WP-appservice-rg/providers/Microsoft.Web/sites/pianificatore-settimanale-scuole",
+    "appService.defaultWebAppToDeploy": "",
     "appService.deploySubpath": "."
 }
