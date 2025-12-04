@@ -57,7 +57,7 @@ class WeeklyPlannerApp {
     const loadingBarLabel = document.getElementById("loading-bar-label");
     let loadingTimer = null;
     let loadingStart = 0;
-    let loadingTarget90 = 0;
+    let loadingTargetMs = 0;
     let pendingResetStep = null;
 
     const THEME_STORAGE_KEY = "weeklyPlannerTheme";
@@ -880,13 +880,13 @@ class WeeklyPlannerApp {
       // Usa lo stimatore solo per MIP, altrimenti barra fissa a 10 secondi
       const totalMs = appState.method === "mip" ? estimateWorkMs() : 10000;
       loadingStart = Date.now();
-      loadingTarget90 = Math.max(800, totalMs * 0.85);
+      loadingTargetMs = Math.max(800, totalMs * 0.85);
       setProgress(appState.method === "mip" ? 4 : 6);
       if (loadingTimer) clearInterval(loadingTimer);
       loadingTimer = setInterval(() => {
         const elapsed = Date.now() - loadingStart;
-        const projected = (elapsed / loadingTarget90) * 90;
-        setProgress(Math.min(90, projected));
+        const projected = (elapsed / loadingTargetMs) * 99;
+        setProgress(Math.min(99, projected));
       }, 250);
       return () => setProgress;
     }
