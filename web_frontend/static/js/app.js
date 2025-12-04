@@ -864,7 +864,7 @@ class WeeklyPlannerApp {
 
       const complexity = (d / 2.5) * (h / 5) * (p**2) * (c**2) * (1 + avgHoursPerProf);
       // Stimatore: per MIP aumenta con dimensione e si rallenta se disponibilità è scarsa
-      const factor = appState.method === "mip" ? 0.5 : 0.01;
+      const factor = appState.method = 0.1;
       const estimate = complexity * factor;
       return estimate;
     }
