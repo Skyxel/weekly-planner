@@ -18,13 +18,16 @@ class WeeklyPlanner:
       - disponibilità dei professori
       - nessuna sovrapposizione prof/classe
       - eventuale mercoledì pomeriggio libero
+      - se un prof è "docente di classe", non ha il limite di 2 ore al
+        giorno con la stessa classe né quello dei blocchi da 2 ore
       - per ogni (prof, classe):
           * le ore sono aggregate in blocchi da 2 ore consecutive
             nello stesso giorno finché possibile
           * se il totale H[p,c] è dispari, rimane al massimo 1 ora singola
-      - per ogni (prof, classe, giorno): 0, 1 o 2 ore
-      - se ci sono 2 ore nello stesso giorno per (prof,classe),
-        sono sempre consecutive (per costruzione)
+      - per ogni (prof, classe, giorno): 0, 1 o 2 ore (tranne per docenti di
+        classe, che possono avere blocchi aggiuntivi)
+      - se ci sono 2 ore nello stesso giorno per (prof,classe) non docente di
+        classe, sono sempre consecutive (per costruzione)
       - nessun blocco di 2 ore a cavallo tra mattina e pomeriggio
 
     L'ottimizzazione cerca di:
@@ -51,6 +54,13 @@ class WeeklyPlanner:
 
         self.last_morning_hour = config.last_morning_hour
         self.wednesday_afternoon_free = config.wednesday_afternoon_free
+        self.class_teachers = np.array(
+            config.class_teachers if config.class_teachers is not None else [False] * self.n,
+            dtype=bool,
+        )
+        if self.class_teachers.shape != (self.n,):
+            self.class_teachers = np.resize(self.class_teachers, (self.n,))
+        self.class_teachers = self.class_teachers.astype(bool)
 
     # ------------------------------------------------------------------
     # Controllo validità
@@ -79,6 +89,9 @@ class WeeklyPlanner:
                         )
 
         return valid
+
+    def _is_class_teacher(self, prof: int) -> bool:
+        return bool(self.class_teachers[prof]) if 0 <= prof < len(self.class_teachers) else False
 
     # ------------------------------------------------------------------
     # Funzione di costo: buche e compattezza per professore
@@ -236,7 +249,7 @@ class WeeklyPlanner:
                         continue
 
                     # max 2 ore al giorno per (prof, classe)
-                    if np.count_nonzero(P[day, :, cls] == prof + 1) >= 2:
+                    if (not self._is_class_teacher(prof)) and np.count_nonzero(P[day, :, cls] == prof + 1) >= 2:
                         continue
 
                     # ok, assegniamo la singola ora
@@ -285,7 +298,7 @@ class WeeklyPlanner:
 
                     # per questo (prof,classe,giorno) non devono esserci già ore
                     # (altrimenti superiamo le 2 ore/giorno o rompiamo i blocchi)
-                    if np.count_nonzero(P[day, :, cls] == prof + 1) > 0:
+                    if (not self._is_class_teacher(prof)) and np.count_nonzero(P[day, :, cls] == prof + 1) > 0:
                         continue
 
                     # ok, assegniamo il blocco da 2 ore consecutive

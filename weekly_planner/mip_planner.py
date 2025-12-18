@@ -19,9 +19,9 @@ class MIPWeeklyPlanner:
       - disponibilità professori
       - nessuna sovrapposizione prof/classe
       - mercoledì pomeriggio libero (se attivo)
-      - max 2 ore al giorno per (prof, classe)
+      - max 2 ore al giorno per (prof, classe) se non docente di classe
       - nessun blocco di 2 ore a cavallo tra mattina e pomeriggio
-      - per una data (classe, prof, giorno) non sono ammesse
+      - per una data (classe, prof, giorno) non sono ammesse (se non docente di classe)
         2 ore NON adiacenti:
           ⇒ in pratica, con max 2 ore/dì:
              - 0 ore
@@ -55,6 +55,13 @@ class MIPWeeklyPlanner:
 
         self.last_morning_hour = config.last_morning_hour
         self.wed_free = config.wednesday_afternoon_free
+        self.class_teachers = np.array(
+            config.class_teachers if config.class_teachers is not None else [False] * self.n,
+            dtype=bool,
+        )
+        if self.class_teachers.shape != (self.n,):
+            self.class_teachers = np.resize(self.class_teachers, (self.n,))
+        self.class_teachers = self.class_teachers.astype(bool)
 
     def _is_available(self, prof: int, day: int, hour: int) -> bool:
         slot = 0 if hour < self.last_morning_hour else 1
@@ -159,6 +166,8 @@ class MIPWeeklyPlanner:
         for d in range(D):
             for p in range(N):
                 for c in range(M):
+                    if self.class_teachers[p]:
+                        continue
                     prob += (
                         pulp.lpSum(x[(d, h, c, p)] for h in range(H)) <= 2,
                         f"Max2Hours_d{d}_p{p}_c{c}",
@@ -178,6 +187,8 @@ class MIPWeeklyPlanner:
         # -----------------------------------------------------------
         for d in range(D):
             for p in range(N):
+                if self.class_teachers[p]:
+                    continue
                 for c in range(M):
                     for h1 in range(H):
                         for h2 in range(h1 + 2, H):

@@ -50,6 +50,8 @@ class PlannerRequest(BaseModel):
     seed: Optional[int] = None
     # Piano già generato da riutilizzare per i PDF (shape: days x daily_hours x num_classes)
     plan: Optional[List[List[List[int]]]] = None
+    # Flag per indicare i docenti di classe (niente limite 2h/dì con la classe)
+    class_teachers: Optional[List[bool]] = None
 
 
 def build_config_from_request(req: PlannerRequest) -> PlannerConfig:
@@ -84,6 +86,14 @@ def build_config_from_request(req: PlannerRequest) -> PlannerConfig:
             raise ValueError("Struttura availability non valida.")
         availability_array = A
 
+    class_teachers = None
+    if req.class_teachers is not None:
+        if len(req.class_teachers) != len(req.professor_names):
+            raise ValueError(
+                "La lunghezza di class_teachers deve coincidere con i professori."
+            )
+        class_teachers = [bool(v) for v in req.class_teachers]
+
     return PlannerConfig(
         days=req.days,
         daily_hours=req.daily_hours,
@@ -97,6 +107,7 @@ def build_config_from_request(req: PlannerRequest) -> PlannerConfig:
         professor_names=req.professor_names,
         hour_names=req.hour_names,
         seed=req.seed,
+        class_teachers=class_teachers,
     )
 
 

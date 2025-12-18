@@ -20,6 +20,7 @@ class WeeklyPlannerApp {
       appState.classNames = [];
       appState.hourNames = [];
       appState.hoursMatrix = null;
+      appState.classTeachers = [];
       appState.availability = null;
       appState.method = "mip";
       appState.lastPlanResponse = null;
@@ -444,7 +445,13 @@ class WeeklyPlannerApp {
 
       const thTotal = document.createElement("th");
       thTotal.textContent = "Totale";
+      thTotal.className = "total-header";
       headRowH.appendChild(thTotal);
+
+      const thClassTeacher = document.createElement("th");
+      thClassTeacher.innerHTML = "Docente<br>di classe";
+      thClassTeacher.className = "class-teacher-header";
+      headRowH.appendChild(thClassTeacher);
 
       for (let c = 0; c < numClass; c++) {
         const th = document.createElement("th");
@@ -466,6 +473,19 @@ class WeeklyPlannerApp {
         tdTotal.dataset.profIndex = p;
         tdTotal.textContent = "0";
         row.appendChild(tdTotal);
+
+        const tdClassTeacher = document.createElement("td");
+        tdClassTeacher.className = "class-teacher-cell";
+        const ctToggle = document.createElement("input");
+        ctToggle.type = "checkbox";
+        ctToggle.dataset.profIndex = p;
+        ctToggle.dataset.classTeacher = "true";
+        ctToggle.setAttribute(
+          "aria-label",
+          `Segna ${profNames[p]} come docente di classe`
+        );
+        tdClassTeacher.appendChild(ctToggle);
+        row.appendChild(tdClassTeacher);
 
         for (let c = 0; c < numClass; c++) {
           const td = document.createElement("td");
@@ -489,6 +509,7 @@ class WeeklyPlannerApp {
       matrixContainer.innerHTML = "";
       matrixContainer.appendChild(tableH);
       prefillMatrixFromState();
+      prefillClassTeacherFlags();
       updateAllHTotals();
       addMatrixKeyboardNavigation();
       wireHoursLiveSync();
@@ -624,6 +645,16 @@ class WeeklyPlannerApp {
           }
         }
       }
+      if (
+        !Array.isArray(appState.classTeachers) ||
+        appState.classTeachers.length !== numProf
+      ) {
+        appState.classTeachers = Array.from({ length: numProf }, () => false);
+      } else {
+        appState.classTeachers = appState.classTeachers.map((v, idx) =>
+          idx < numProf ? !!v : false
+        );
+      }
       appState.availability = normalizeAvailability(
         appState.availability,
         numProf,
@@ -662,6 +693,18 @@ class WeeklyPlannerApp {
         }
       }
       updateAllHTotals();
+    }
+
+    function prefillClassTeacherFlags() {
+      const numProf = appState.numProf || 0;
+      for (let p = 0; p < numProf; p++) {
+        const input = matrixContainer.querySelector(
+          `input[data-class-teacher='true'][data-prof-index='${p}']`
+        );
+        if (!input) continue;
+        const v = !!appState.classTeachers?.[p];
+        input.checked = v;
+      }
     }
 
     function prefillAvailabilityFromState() {
@@ -728,7 +771,23 @@ class WeeklyPlannerApp {
             updateHRowTotal(p);
           });
         });
-
+      matrixContainer
+        .querySelectorAll("input[type='checkbox'][data-class-teacher='true']")
+        .forEach((el) => {
+          el.addEventListener("change", (e) => {
+            const p = parseInt(e.target.dataset.profIndex, 10);
+            if (!Array.isArray(appState.classTeachers)) return;
+            appState.classTeachers[p] = !!e.target.checked;
+          });
+          const td = el.closest("td");
+          if (td) {
+            td.addEventListener("click", (evt) => {
+              if (evt.target === el) return;
+              el.checked = !el.checked;
+              el.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+          }
+        });
     }
 
     function wireAvailabilityLiveSync() {
@@ -787,6 +846,14 @@ class WeeklyPlannerApp {
       }
 
       appState.hoursMatrix = H;
+      const classTeachers = [];
+      for (let p = 0; p < numProf; p++) {
+        const toggle = matrixContainer.querySelector(
+          `input[data-class-teacher='true'][data-prof-index='${p}']`
+        );
+        classTeachers.push(!!toggle?.checked);
+      }
+      appState.classTeachers = classTeachers;
 
       return true;
     }
@@ -909,6 +976,7 @@ class WeeklyPlannerApp {
         daily_hours: appState.dailyHours,
         class_names: appState.classNames,
         professor_names: appState.professorNames,
+        class_teachers: appState.classTeachers,
         hours_matrix: appState.hoursMatrix,
         availability: appState.availability,
         wednesday_afternoon_free: appState.wedFree,
@@ -1211,6 +1279,7 @@ class WeeklyPlannerApp {
       const H = [];
       const numProf = appState.numProf || 0;
       const numClass = appState.numClass || 0;
+      const classTeachers = [];
 
       for (let p = 0; p < numProf; p++) {
         const row = [];
@@ -1222,12 +1291,17 @@ class WeeklyPlannerApp {
           row.push(val);
         }
         H.push(row);
+        const toggle = matrixContainer.querySelector(
+          `input[data-class-teacher='true'][data-prof-index='${p}']`
+        );
+        classTeachers.push(!!toggle?.checked);
       }
 
       return {
         num_professors: numProf,
         num_classes: numClass,
         hours_matrix: H,
+        class_teachers: classTeachers,
       };
     }
 
@@ -1264,7 +1338,13 @@ class WeeklyPlannerApp {
       appState.hoursMatrix = obj.hours_matrix.map((row) =>
         row.map((v) => parseInt(v, 10) || 0)
       );
+      appState.classTeachers = Array.isArray(obj.class_teachers)
+        ? obj.class_teachers.map((v, idx) =>
+            idx < numProf ? !!v : false
+          )
+        : Array.from({ length: numProf }, () => false);
       updateAllHTotals();
+      prefillClassTeacherFlags();
     }
 
     function getStep3DataRaw() {
@@ -1712,6 +1792,10 @@ class WeeklyPlannerApp {
       appState.hoursMatrix = Array.from({ length: appState.numProf }, () =>
         Array.from({ length: appState.numClass }, () => 0)
       );
+      appState.classTeachers = Array.from(
+        { length: appState.numProf },
+        () => false
+      );
       // Ricostruisci UI coerente con reset
       buildHoursTable();
     }
@@ -1916,6 +2000,7 @@ class WeeklyPlannerApp {
         classNames: appState.classNames,
         hourNames: appState.hourNames,
         hoursMatrix: appState.hoursMatrix,
+        classTeachers: appState.classTeachers,
         availability: appState.availability,
         method: appState.method,
         seedEnabled: appState.seedEnabled,
@@ -2020,6 +2105,9 @@ class WeeklyPlannerApp {
       appState.hoursMatrix = Array.isArray(obj.hoursMatrix)
         ? obj.hoursMatrix
         : null;
+      appState.classTeachers = Array.isArray(obj.classTeachers)
+        ? obj.classTeachers
+        : [];
       appState.availability = Array.isArray(obj.availability)
         ? obj.availability
         : null;
@@ -2170,6 +2258,14 @@ class WeeklyPlannerApp {
           updateUrl();
         })
       );
+      matrixContainer
+        .querySelectorAll("input[type='checkbox'][data-class-teacher='true']")
+        .forEach((el) =>
+          el.addEventListener("change", () => {
+            persistLocal();
+            updateUrl();
+          })
+        );
     };
     const origWireAvailabilityLiveSync = wireAvailabilityLiveSync;
     wireAvailabilityLiveSync = function () {
