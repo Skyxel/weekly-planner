@@ -14,6 +14,14 @@ from .models import PlannerConfig
 
 def validate_config(config: PlannerConfig) -> List[str]:
     errors: List[str] = []
+    class_teachers = np.array(
+        config.class_teachers
+        if config.class_teachers is not None
+        else [False] * config.num_professors,
+        dtype=bool,
+    )
+    if class_teachers.shape != (config.num_professors,):
+        errors.append("Dimensioni di class_teachers non coerenti.")
 
     # Giorni
     if not isinstance(config.days, int) or config.days < 1 or config.days > 7:
@@ -92,7 +100,7 @@ def validate_config(config: PlannerConfig) -> List[str]:
     # (al massimo 2 ore/giorno per (prof,classe) => H[p,c] <= 2*days)
     for p in range(config.num_professors):
         for c in range(config.num_classes):
-            if H[p, c] > 2 * config.days:
+            if not class_teachers[p] and H[p, c] > 2 * config.days:
                 errors.append(
                     f"Ore richieste troppo alte per prof {p+1}/classe {c+1}: {H[p,c]} > 2*giorni"
                 )

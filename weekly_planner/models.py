@@ -40,6 +40,8 @@ class PlannerConfig:
     hour_names: Optional[List[str]] = None
     # Seed opzionale per random planner (0..9_999_999_999)
     seed: Optional[int] = None
+    # Flag per indicare se un professore è docente di classe (niente limite 2h/dì)
+    class_teachers: Optional[List[bool]] = None
 
 
 @dataclass

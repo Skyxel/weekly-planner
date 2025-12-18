@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pianificatore settimanale per scuole</title>
-    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=3" />
   </head>
   <body>
     <div class="app-shell">
@@ -348,7 +348,10 @@
                 <p class="step-card-subtitle">
                   Indica quante ore ogni professore ha con ciascuna classe
                   nell'arco della settimana. Lascia <strong>0</strong> se un
-                  professore non ha quella classe.
+                  professore non ha quella classe. Usa la colonna
+                  <em>Docente di classe</em> per consentire allo stesso docente
+                  di superare il limite di 2 ore consecutive/2 ore al giorno
+                  con la classe.
                 </p>
               </div>
             </div>
@@ -648,6 +651,6 @@
       </a>
     </div>
 
-    <script src="/static/js/app.js?v=2"></script>
+    <script src="/static/js/app.js?v=3"></script>
   </body>
 </html>

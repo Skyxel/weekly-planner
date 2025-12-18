@@ -8,23 +8,23 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f6f8fc;
-  --card: #ffffff;
-  --card-strong: #edf2fb;
-  --surface-muted: #f2f5fb;
+  --bg: #e9eef5;
+  --card: #f7f9fc;
+  --card-strong: #ecf1fa;
+  --surface-muted: #e3e9f4;
   --accent: #0ea5e9;
   --accent-strong: #0284c7;
   --accent-soft: rgba(14, 165, 233, 0.12);
-  --border: #d6deeb;
-  --border-strong: #c3cedf;
-  --text: #0f172a;
-  --muted: #556075;
+  --border: #c5d1e3;
+  --border-strong: #b5c4db;
+  --text: #0c1326;
+  --muted: #4c5a72;
   --danger: #e23f3f;
-  --table-stripe: #f7f9fd;
-  --pill: rgba(14, 165, 233, 0.12);
-  --input-bg: #f8fbff;
+  --table-stripe: #eef3fb;
+  --pill: rgba(14, 165, 233, 0.14);
+  --input-bg: #f2f6fb;
   --input-shadow: 0 10px 28px rgba(14, 165, 233, 0.12);
-  --glow: 0 22px 60px rgba(14, 165, 233, 0.16);
+  --glow: 0 26px 70px rgba(14, 165, 233, 0.22);
 }
 
 :root[data-theme="dark"] {
@@ -545,10 +545,33 @@ th {
   background: var(--surface-muted);
   color: var(--muted);
   position: sticky;
-  top: 0;
   z-index: 2;
   height: var(--table-head-row);
   line-height: 1.2;
+}
+
+thead th {
+  top: 0;
+}
+
+#matrix-container th {
+  background: var(--card-strong);
+  color: var(--text);
+  font-weight: 700;
+}
+
+#matrix-container thead th {
+  top: 0;
+}
+
+#matrix-container tbody th {
+  position: sticky;
+  top: auto;
+  left: 0;
+  z-index: 3;
+  background: var(--card-strong);
+  color: var(--text);
+  font-weight: 700;
 }
 
 tbody tr:nth-child(odd) td,
@@ -559,6 +582,11 @@ tbody tr:nth-child(odd) th {
 tbody tr:nth-child(even) td,
 tbody tr:nth-child(even) th {
   background: var(--card);
+}
+
+tbody td,
+tbody th {
+  border-bottom: 1px solid var(--border);
 }
 
 #availability-container td {
@@ -572,6 +600,60 @@ tbody tr:nth-child(even) th {
 td[data-part],
 th[data-part] {
   border-color: var(--border);
+}
+
+#availability-container th {
+  background: var(--card-strong);
+  color: var(--text);
+  font-weight: 700;
+  top: 0;
+}
+
+#availability-container tbody th {
+  position: sticky;
+  top: auto;
+  left: 0;
+  z-index: 3;
+  background: var(--card-strong);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.class-teacher-cell {
+  text-align: center;
+  min-width: 96px;
+  color: var(--muted);
+  cursor: pointer;
+  background: var(--surface-muted);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.class-teacher-cell input[type="checkbox"] {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.class-teacher-header {
+  min-width: 96px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface-muted));
+  color: var(--text);
+  font-weight: 700;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.total-header {
+  min-width: 72px;
+  text-align: center;
+}
+
+.total-cell {
+  min-width: 72px;
+  background: var(--surface-muted);
+  font-weight: 600;
 }
 
 .preview-layout {
@@ -635,7 +717,7 @@ th[data-part] {
   position: sticky;
   left: 0;
   z-index: 3;
-  background: var(--surface-muted);
+  background: var(--card-strong);
 }
 
 #matrix-container thead th:first-child,
