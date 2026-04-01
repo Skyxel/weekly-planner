@@ -51,3 +51,6 @@ class PlanResult:
     """
     plans: List[np.ndarray]    # lista di matrici (days, daily_hours, num_classes)
     scores: List[float]        # valore funzione di ottimizzazione (più basso = meglio)
+    # Etichette opzionali (es. Settimana A/B) per i piani restituiti
+    week_labels: List[str] | None = None
+    subject_plans: Optional[List[np.ndarray]] = None  # shape (days, daily_hours, num_classes), subject_id 1-based o 0

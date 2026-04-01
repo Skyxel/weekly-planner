@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pianificatore settimanale per scuole</title>
-    <link rel="stylesheet" href="/static/css/styles.css?v=3" />
+    <link rel="stylesheet" href="/static/css/styles.css?v=33" />
   </head>
   <body>
     <div class="app-shell">
@@ -52,14 +52,30 @@
         </div>
         <div class="stepper-item" data-step="2">
           <div class="step-circle">2</div>
-          <div class="step-label">Ore</div>
+          <div class="step-label">Nomenclatura</div>
         </div>
         <div class="stepper-item" data-step="3">
           <div class="step-circle">3</div>
-          <div class="step-label">Disponibilità</div>
+          <div class="step-label">Ore</div>
         </div>
         <div class="stepper-item" data-step="4">
           <div class="step-circle">4</div>
+          <div class="step-label">Assegnazione</div>
+        </div>
+        <div class="stepper-item" data-step="5">
+          <div class="step-circle">5</div>
+          <div class="step-label">Limiti</div>
+        </div>
+        <div class="stepper-item" data-step="6">
+          <div class="step-circle">6</div>
+          <div class="step-label">Preferenze</div>
+        </div>
+        <div class="stepper-item" data-step="7">
+          <div class="step-circle">7</div>
+          <div class="step-label">Disponibilità</div>
+        </div>
+        <div class="stepper-item" data-step="8">
+          <div class="step-circle">8</div>
           <div class="step-label">Genera piano</div>
         </div>
       </div>
@@ -216,90 +232,22 @@
                   Deve essere un numero
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Nomi -->
-          <div class="step-card">
-            <div class="step-card-header">
-              <div>
-                <div class="step-card-title">Nomenclatura (opzionale)</div>
-                <p class="step-card-subtitle">
-                  I nomi inseriti devono essere separati da
-                  <strong>virgola</strong>.
-                </p>
+              <div class="field">
+                <label class="field-label">Numero materie</label>
+                <input
+                  class="input"
+                  type="number"
+                  id="num_subjects"
+                  value="0"
+                  min="0"
+                  max="40"
+                />
+                <div class="validation-msg" id="val-num_subjects">
+                  Deve essere un numero
+                </div>
               </div>
             </div>
-
-            <div class="field">
-              <label class="field-label">Professori</label>
-              <input
-                class="input"
-                type="text"
-                id="professor_names"
-                placeholder="Mario Rossi (Mate), P. Bianchi (Ita), ..."
-              />
-              <div
-                class="validation-msg"
-                id="val-professor_names"
-                style="display: none"
-              >
-                I nomi dei professori devono corrispondere al numero indicato.
-              </div>
-            </div>
-
-            <div class="field" style="margin-top: 10px">
-              <label class="field-label">Classi</label>
-              <input
-                class="input"
-                type="text"
-                id="class_names"
-                placeholder="1A, 1B, 2A, ..."
-              />
-              <div
-                class="validation-msg"
-                id="val-class_names"
-                style="display: none"
-              >
-                I nomi delle classi devono corrispondere al numero indicato.
-              </div>
-            </div>
-
-            <div class="field" style="margin-top: 10px">
-              <label class="field-label">Giorni</label>
-              <input
-                class="input"
-                type="text"
-                id="day_names"
-                placeholder="Lunedi, Martedi, Mercoledi, ..."
-              />
-              <div
-                class="validation-msg"
-                id="val-day_names"
-                style="display: none"
-              >
-                I nomi dei giorni devono corrispondere al numero indicato.
-              </div>
-            </div>
-
-            <div class="field" style="margin-top: 10px">
-              <label class="field-label">Ore</label>
-              <input
-                class="input"
-                type="text"
-                id="hour_names"
-                placeholder="8:00, 9:00, 10:00, ..."
-              />
-              <div
-                class="validation-msg"
-                id="val-hour_names"
-                style="display: none"
-              >
-                I nomi delle ore devono corrispondere al numero totale di ore.
-              </div>
-            </div>
-
-            <!-- Navigazione spostata in alto -->
           </div>
         </div>
         <div class="center-row">
@@ -318,7 +266,7 @@
         </div>
       </div>
 
-      <!-- STEP 2: ORE -->
+      <!-- STEP 2: NOMENCLATURA -->
       <div class="step-container" id="step-2">
         <div class="nav-row top">
           <div class="nav-row-left">
@@ -337,49 +285,60 @@
             </button>
           </div>
         </div>
+
         <div class="step-grid">
-          <!-- Matrice ore H -->
-          <div class="step-card">
+          <div class="step-card" style="grid-column: 1 / -1">
             <div class="step-card-header">
               <div>
-                <div class="step-card-title">
-                  Ore settimanali per prof / classe
-                </div>
+                <div class="step-card-title">Nomenclatura</div>
                 <p class="step-card-subtitle">
-                  Indica quante ore ogni professore ha con ciascuna classe
-                  nell'arco della settimana. Lascia <strong>0</strong> se un
-                  professore non ha quella classe. Usa la colonna
-                  <em>Docente di classe</em> per consentire allo stesso docente
-                  di superare il limite di 2 ore consecutive/2 ore al giorno con
-                  la classe.
+                  Inserisci un nome per ogni elemento. I campi sono precompilati
+                  automaticamente.
                 </p>
               </div>
             </div>
 
-            <div class="table-scroller">
-              <div id="matrix-container"></div>
+            <div class="nomenclature-grid">
+              <div class="nomenclature-block">
+                <div class="field-label">Professori</div>
+                <div id="nomenclature-professors" class="naming-grid"></div>
+              </div>
+              <div class="nomenclature-block">
+                <div class="field-label">Classi</div>
+                <div id="nomenclature-classes" class="naming-grid"></div>
+              </div>
+              <div class="nomenclature-block">
+                <div class="field-label">Materie</div>
+                <div id="nomenclature-subjects" class="naming-grid"></div>
+              </div>
+              <div class="nomenclature-block">
+                <div class="field-label">Giorni</div>
+                <div id="nomenclature-days" class="naming-grid"></div>
+              </div>
+              <div class="nomenclature-block">
+                <div class="field-label">Ore</div>
+                <div id="nomenclature-hours" class="naming-grid"></div>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Bottoni JSON centrati sotto le due card -->
         <div class="center-row">
-          <button class="btn" id="download-step2-json">
-            <span class="btn-icon">⬇</span>Scarica JSON ore
+          <button class="btn" id="download-nomenclature-json">
+            <span class="btn-icon">⬇</span>Scarica JSON nomenclatura
           </button>
-          <button class="btn" id="upload-step2-json-btn">
-            <span class="btn-icon">⬆</span>Carica JSON ore
+          <button class="btn" id="upload-nomenclature-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON nomenclatura
           </button>
           <input
             type="file"
-            id="upload-step2-json"
+            id="upload-nomenclature-json"
             accept="application/json"
             style="display: none"
           />
         </div>
       </div>
 
-      <!-- STEP 3: DISPONIBILITÀ -->
+      <!-- STEP 3: ORE -->
       <div class="step-container" id="step-3">
         <div class="nav-row top">
           <div class="nav-row-left">
@@ -394,6 +353,234 @@
           </div>
           <div class="nav-row-right">
             <button class="btn btn-primary" id="to-step-4">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Ore per materia e classe</div>
+                <p class="step-card-subtitle">
+                  Inserisci quante ore totali ogni classe deve coprire per
+                  ciascuna materia.
+                </p>
+              </div>
+            </div>
+
+            <div class="table-scroller">
+              <div id="subject-hours-container"></div>
+            </div>
+          </div>
+        </div>
+        <div class="center-row">
+          <button class="btn" id="download-subject-hours-json">
+            <span class="btn-icon">⬇</span>Scarica JSON ore materie/classi
+          </button>
+          <button class="btn" id="upload-subject-hours-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON ore materie/classi
+          </button>
+          <input
+            type="file"
+            id="upload-subject-hours-json"
+            accept="application/json"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- STEP 4: ASSEGNAZIONE ORE/MATERIE -->
+      <div class="step-container" id="step-4">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-3">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-4">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-5">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <div class="step-card coverage-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Copertura ore per materia</div>
+                <p class="step-card-subtitle">
+                  Confronta le ore disponibili dai docenti con le ore richieste
+                  per ogni materia.
+                </p>
+              </div>
+            </div>
+            <div id="assignments-info" class="coverage-list"></div>
+            <div
+              id="assignments-warning"
+              class="alert-text"
+              style="display: none"
+            ></div>
+          </div>
+
+          <div class="step-card" style="grid-column: 1 / -1">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Assegnazione ore e materie</div>
+                <p class="step-card-subtitle">
+                  Seleziona fino a 2 materie per ogni docente e indica le ore
+                  totali da svolgere per ciascuna.
+                </p>
+              </div>
+            </div>
+
+            <div id="assignments-container" class="assignments-container"></div>
+          </div>
+        </div>
+        <div class="center-row">
+          <button class="btn" id="download-assignments-json">
+            <span class="btn-icon">⬇</span>Scarica JSON assegnazioni
+          </button>
+          <button class="btn" id="upload-assignments-json-btn">
+            <span class="btn-icon">⬆</span>Carica JSON assegnazioni
+          </button>
+          <input
+            type="file"
+            id="upload-assignments-json"
+            accept="application/json"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- STEP 5: LIMITI GIORNALIERI -->
+      <div class="step-container" id="step-5">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-4">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-5">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-6">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Limiti</div>
+                <p class="step-card-subtitle">
+                  Definisci quante ore massime al giorno una classe può fare per
+                  ciascuna materia (default 2). Puoi anche decidere se aggregare
+                  le ore al massimo giornaliero.
+                </p>
+              </div>
+            </div>
+
+            <div class="rules-row">
+              <label class="checkbox-inline">
+                <input type="checkbox" id="rule-aggregate-hours" checked />
+                <span>Aggrega ore sul massimo giornaliero se possibile</span>
+                <span
+                  class="info-icon"
+                  data-info="Se possibile, raggruppa le ore di una materia fino al massimo giornaliero impostato per ridurre la frammentazione."
+                  aria-label="Informazioni su aggregazione ore"
+                  tabindex="0"
+                >
+                  i
+                </span>
+              </label>
+            </div>
+
+            <div class="table-scroller">
+              <div id="daily-max-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: PREFERENZE -->
+      <div class="step-container" id="step-6">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-5">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-6">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-7">
+              Avanti <span class="btn-icon">➜</span>
+            </button>
+          </div>
+        </div>
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-card-header">
+              <div>
+                <div class="step-card-title">Preferenze</div>
+                <p class="step-card-subtitle">
+                  Indica le classi preferite per ciascun docente. Se
+                  selezionato, il docente avrà priorità su quella classe.
+                </p>
+              </div>
+            </div>
+
+            <div class="rules-row">
+              <label class="checkbox-inline">
+                <input type="checkbox" id="rule-single-teacher" checked />
+                <span>Preferisci un solo docente per materia/classe</span>
+                <span
+                  class="info-icon"
+                  data-info="Dove possibile mantieni la stessa materia/classe assegnata ad un solo docente, evitando suddivisioni tra insegnanti."
+                  aria-label="Informazioni su docente unico"
+                  tabindex="0"
+                >
+                  i
+                </span>
+              </label>
+            </div>
+
+            <div class="table-scroller">
+              <div id="preferences-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7: DISPONIBILITÀ -->
+      <div class="step-container" id="step-7">
+        <div class="nav-row top">
+          <div class="nav-row-left">
+            <button class="btn btn-ghost" id="back-to-6">
+              <span class="btn-icon">←</span> Indietro
+            </button>
+          </div>
+          <div class="nav-row-center">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-7">
+              Reset
+            </button>
+          </div>
+          <div class="nav-row-right">
+            <button class="btn btn-primary" id="to-step-8">
               Avanti <span class="btn-icon">➜</span>
             </button>
           </div>
@@ -432,16 +619,16 @@
         </div>
       </div>
 
-      <!-- STEP 4: GENERA PIANO -->
-      <div class="step-container" id="step-4">
+      <!-- STEP 8: GENERA PIANO -->
+      <div class="step-container" id="step-8">
         <div class="nav-row top">
           <div class="nav-row-left">
-            <button class="btn btn-ghost" id="back-to-3">
+            <button class="btn btn-ghost" id="back-to-7">
               <span class="btn-icon">←</span> Indietro
             </button>
           </div>
           <div class="nav-row-center">
-            <button class="btn btn-reset nav-reset-centered" id="reset-step-4">
+            <button class="btn btn-reset nav-reset-centered" id="reset-step-8">
               Reset
             </button>
           </div>
@@ -479,7 +666,7 @@
                         Modalità
                         <span
                           class="info-icon"
-                          data-info="Buona: più veloce, soluzione valida ma non ottimale. Ottimale: più lento, cerca la soluzione migliore usando il risolutore MIP."
+                          data-info="Veloce: algoritmo greedy, soluzione valida in pochi secondi. Intelligente: risolutore MIP, ottimizza la soluzione ma più lento."
                           aria-label="Informazioni sulla modalità"
                           tabindex="0"
                         >
@@ -490,10 +677,10 @@
                         <button
                           type="button"
                           class="mode-btn"
-                          id="mode-random"
+                          id="mode-greedy"
                           aria-pressed="false"
                         >
-                          Buona
+                          Veloce
                         </button>
                         <button
                           type="button"
@@ -501,7 +688,7 @@
                           id="mode-mip"
                           aria-pressed="true"
                         >
-                          Ottimale
+                          Intelligente
                         </button>
                       </div>
                     </div>
@@ -558,11 +745,19 @@
                 <div class="save-actions">
                   <button class="btn" id="download-professors-pdf-btn">
                     <span class="btn-icon">⬇</span>
-                    Scarica piano professori
+                    PDF professori
                   </button>
                   <button class="btn" id="download-classes-pdf-btn">
                     <span class="btn-icon">⬇</span>
-                    Scarica piano classi
+                    PDF classi
+                  </button>
+                  <button class="btn" id="download-professors-excel-btn">
+                    <span class="btn-icon">⬇</span>
+                    Excel professori
+                  </button>
+                  <button class="btn" id="download-classes-excel-btn">
+                    <span class="btn-icon">⬇</span>
+                    Excel classi
                   </button>
                   <button
                     class="btn"
@@ -651,6 +846,6 @@
       </a>
     </div>
 
-    <script src="/static/js/app.js?v=3"></script>
+    <script src="/static/js/app.js?v=13"></script>
   </body>
 </html>

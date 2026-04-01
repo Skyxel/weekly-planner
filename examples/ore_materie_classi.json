@@ -1,0 +1,22 @@
+{
+  "subject_hours": [
+    {
+      "altWeeks": false,
+      "hours": [4, 4],
+      "hoursA": [0, 0],
+      "hoursB": [0, 0]
+    },
+    {
+      "altWeeks": false,
+      "hours": [3, 3],
+      "hoursA": [0, 0],
+      "hoursB": [0, 0]
+    },
+    {
+      "altWeeks": true,
+      "hours": [0, 0],
+      "hoursA": [2, 2],
+      "hoursB": [1, 3]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "days": 5,
+  "morning_hours": 5,
+  "afternoon_hours": 1,
+  "num_professors": 3,
+  "num_classes": 2,
+  "num_subjects": 3,
+  "wednesday_afternoon_free": true,
+  "free_afternoon_day": 3,
+  "free_afternoon_enabled": true
+}

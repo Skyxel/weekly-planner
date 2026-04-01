@@ -1,0 +1,282 @@
+{
+  "payload": {
+    "days": 5,
+    "daily_hours": 8,
+    "class_names": [
+      "1A",
+      "1B",
+      "2A",
+      "2B",
+      "3A",
+      "3B",
+      "4A",
+      "4B",
+      "5A",
+      "5B"
+    ],
+    "professor_names": [
+      "Prof. Rossi",
+      "Prof.ssa Bianchi",
+      "Prof. Verdi",
+      "Prof.ssa Neri",
+      "Prof. Galli",
+      "Prof.ssa Conti",
+      "Prof. De Luca",
+      "Prof.ssa Romano",
+      "Prof. Riva",
+      "Prof.ssa Sartori"
+    ],
+    "hours_matrix": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "availability": [
+      [
+        [true, true],
+        [true, true],
+        [true, false],
+        [true, true],
+        [true, true]
+      ],
+      [
+        [true, true],
+        [true, true],
+        [true, false],
+        [true, true],
+        [false, true]
+      ],
+      [
+        [true, true],
+        [true, false],
+        [true, false],
+        [true, true],
+        [true, true]
+      ],
+      [
+        [true, false],
+        [true, true],
+        [true, false],
+        [true, true],
+        [true, false]
+      ],
+      [
+        [true, true],
+        [true, true],
+        [true, true],
+        [true, false],
+        [false, true]
+      ],
+      [
+        [true, false],
+        [true, true],
+        [true, false],
+        [true, true],
+        [true, false]
+      ],
+      [
+        [true, true],
+        [false, true],
+        [true, false],
+        [false, true],
+        [true, false]
+      ],
+      [
+        [true, false],
+        [true, true],
+        [false, true],
+        [true, false],
+        [true, true]
+      ],
+      [
+        [true, false],
+        [true, false],
+        [true, false],
+        [true, true],
+        [false, true]
+      ],
+      [
+        [false, true],
+        [false, true],
+        [true, false],
+        [true, false],
+        [false, true]
+      ]
+    ],
+    "subject_names": [
+      "Matematica",
+      "Italiano",
+      "Inglese",
+      "Scienze",
+      "Storia e Geografia",
+      "Tecnologia e Arte"
+    ],
+    "subject_class_hours": [
+      {
+        "altWeeks": false,
+        "hours": [4, 4, 4, 4, 5, 5, 4, 4, 5, 5],
+        "hoursA": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursB": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      {
+        "altWeeks": false,
+        "hours": [5, 5, 4, 4, 4, 4, 3, 3, 3, 3],
+        "hoursA": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursB": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      {
+        "altWeeks": false,
+        "hours": [3, 3, 3, 3, 4, 4, 3, 3, 4, 4],
+        "hoursA": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursB": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      {
+        "altWeeks": true,
+        "hours": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursA": [3, 3, 3, 3, 3, 3, 2, 2, 2, 3],
+        "hoursB": [2, 2, 3, 3, 4, 4, 2, 2, 3, 2]
+      },
+      {
+        "altWeeks": false,
+        "hours": [2, 2, 3, 3, 3, 3, 2, 2, 2, 2],
+        "hoursA": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursB": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      {
+        "altWeeks": true,
+        "hours": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "hoursA": [2, 2, 1, 1, 2, 2, 2, 2, 2, 2],
+        "hoursB": [1, 1, 2, 2, 2, 2, 2, 2, 2, 2]
+      }
+    ],
+    "subject_assignments": [
+      {
+        "totalHours": 24,
+        "subjects": [
+          { "subjectIndex": 0, "hours": 14 },
+          { "subjectIndex": 3, "hours": 10 }
+        ]
+      },
+      {
+        "totalHours": 26,
+        "subjects": [
+          { "subjectIndex": 1, "hours": 18 },
+          { "subjectIndex": 0, "hours": 8 }
+        ]
+      },
+      {
+        "totalHours": 24,
+        "subjects": [
+          { "subjectIndex": 2, "hours": 18 },
+          { "subjectIndex": 5, "hours": 6 }
+        ]
+      },
+      {
+        "totalHours": 20,
+        "subjects": [
+          { "subjectIndex": 0, "hours": 12 },
+          { "subjectIndex": 4, "hours": 8 }
+        ]
+      },
+      {
+        "totalHours": 24,
+        "subjects": [
+          { "subjectIndex": 2, "hours": 16 },
+          { "subjectIndex": 3, "hours": 8 }
+        ]
+      },
+      {
+        "totalHours": 20,
+        "subjects": [
+          { "subjectIndex": 1, "hours": 12 },
+          { "subjectIndex": 4, "hours": 8 }
+        ]
+      },
+      {
+        "totalHours": 16,
+        "subjects": [
+          { "subjectIndex": 5, "hours": 6 },
+          { "subjectIndex": 3, "hours": 6 },
+          { "subjectIndex": 0, "hours": 4 }
+        ]
+      },
+      {
+        "totalHours": 15,
+        "subjects": [
+          { "subjectIndex": 1, "hours": 8 },
+          { "subjectIndex": 3, "hours": 3 },
+          { "subjectIndex": 4, "hours": 4 }
+        ]
+      },
+      {
+        "totalHours": 10,
+        "subjects": [
+          { "subjectIndex": 0, "hours": 6 },
+          { "subjectIndex": 5, "hours": 4 }
+        ]
+      },
+      {
+        "totalHours": 6,
+        "subjects": [
+          { "subjectIndex": 4, "hours": 4 },
+          { "subjectIndex": 5, "hours": 2 }
+        ]
+      }
+    ],
+    "subject_daily_max": [
+      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ],
+    "preferences": [
+      [false, false, false, false, false, false, false, false, false, false],
+      [false, false, false, false, false, false, false, false, false, false],
+      [false, false, false, false, false, false, false, false, false, false],
+      [false, false, false, false, false, false, false, false, false, false],
+      [false, false, false, false, false, false, false, false, false, false],
+      [false, false, false, false, false, false, false, false, false, false]
+    ],
+    "generate_both_weeks": true,
+    "aggregate_hours_rule": true,
+    "single_teacher_rule": true,
+    "wednesday_afternoon_free": true,
+    "last_morning_hour": 4,
+    "method": "mip",
+    "hour_names": [
+      "1a ora",
+      "2a ora",
+      "3a ora",
+      "4a ora",
+      "5a ora",
+      "6a ora",
+      "7a ora",
+      "8a ora"
+    ],
+    "seed": 1734521,
+    "plan": null,
+    "plan_week_b": null,
+    "class_teachers": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "using_subject_planner": true
+}

@@ -1,0 +1,76 @@
+{
+  "assignments": [
+    {
+      "totalHours": 24,
+      "subjects": [
+        { "subjectIndex": 0, "hours": 14 },
+        { "subjectIndex": 3, "hours": 10 }
+      ]
+    },
+    {
+      "totalHours": 26,
+      "subjects": [
+        { "subjectIndex": 1, "hours": 18 },
+        { "subjectIndex": 0, "hours": 8 }
+      ]
+    },
+    {
+      "totalHours": 24,
+      "subjects": [
+        { "subjectIndex": 2, "hours": 18 },
+        { "subjectIndex": 5, "hours": 6 }
+      ]
+    },
+    {
+      "totalHours": 20,
+      "subjects": [
+        { "subjectIndex": 0, "hours": 12 },
+        { "subjectIndex": 4, "hours": 8 }
+      ]
+    },
+    {
+      "totalHours": 24,
+      "subjects": [
+        { "subjectIndex": 2, "hours": 16 },
+        { "subjectIndex": 3, "hours": 8 }
+      ]
+    },
+    {
+      "totalHours": 20,
+      "subjects": [
+        { "subjectIndex": 1, "hours": 12 },
+        { "subjectIndex": 4, "hours": 8 }
+      ]
+    },
+    {
+      "totalHours": 16,
+      "subjects": [
+        { "subjectIndex": 5, "hours": 6 },
+        { "subjectIndex": 3, "hours": 6 },
+        { "subjectIndex": 0, "hours": 4 }
+      ]
+    },
+    {
+      "totalHours": 15,
+      "subjects": [
+        { "subjectIndex": 1, "hours": 8 },
+        { "subjectIndex": 3, "hours": 3 },
+        { "subjectIndex": 4, "hours": 4 }
+      ]
+    },
+    {
+      "totalHours": 10,
+      "subjects": [
+        { "subjectIndex": 0, "hours": 6 },
+        { "subjectIndex": 5, "hours": 4 }
+      ]
+    },
+    {
+      "totalHours": 6,
+      "subjects": [
+        { "subjectIndex": 4, "hours": 4 },
+        { "subjectIndex": 5, "hours": 2 }
+      ]
+    }
+  ]
+}

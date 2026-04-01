@@ -1,0 +1,31 @@
+{
+  "assignments": [
+    {
+      "totalHours": 8,
+      "subjects": [
+        {
+          "subjectIndex": 0,
+          "hours": 8
+        }
+      ]
+    },
+    {
+      "totalHours": 6,
+      "subjects": [
+        {
+          "subjectIndex": 1,
+          "hours": 6
+        }
+      ]
+    },
+    {
+      "totalHours": 4,
+      "subjects": [
+        {
+          "subjectIndex": 2,
+          "hours": 4
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "professor_names": [
+    "Prof. Rossi",
+    "Prof.ssa Bianchi",
+    "Prof. Verdi"
+  ],
+  "class_names": [
+    "1A",
+    "1B"
+  ],
+  "subject_names": [
+    "Matematica",
+    "Italiano",
+    "Scienze"
+  ],
+  "day_names": [
+    "Lunedi",
+    "Martedi",
+    "Mercoledi",
+    "Giovedi",
+    "Venerdi"
+  ],
+  "hour_names": [
+    "1a ora",
+    "2a ora",
+    "3a ora",
+    "4a ora",
+    "5a ora",
+    "6a ora"
+  ]
+}

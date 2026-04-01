@@ -321,7 +321,7 @@ class MIPWeeklyPlanner:
 
         status = pulp.LpStatus[prob.status]
         if status not in ("Optimal", "Feasible"):
-            return PlanResult(plans=[], scores=[])
+            return PlanResult(plans=[], scores=[], week_labels=["A"])
 
         # Ricostruisci P[d,h,c] = id_prof (1..N) o 0
         P = np.zeros((D, H, M), dtype=int)
@@ -336,4 +336,4 @@ class MIPWeeklyPlanner:
 
         objective_value = float(pulp.value(prob.objective))
 
-        return PlanResult(plans=[P], scores=[objective_value])
+        return PlanResult(plans=[P], scores=[objective_value], week_labels=["A"])

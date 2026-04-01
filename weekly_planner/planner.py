@@ -349,13 +349,13 @@ class WeeklyPlanner:
             scores.append(score)
 
         if not plans:
-            return PlanResult(plans=[], scores=[])
+            return PlanResult(plans=[], scores=[], week_labels=["A"])
 
         order = np.argsort(np.array(scores))
         plans_sorted = [plans[i] for i in order]
         scores_sorted = [float(scores[i]) for i in order]
 
-        return PlanResult(plans=plans_sorted, scores=scores_sorted)
+        return PlanResult(plans=plans_sorted, scores=scores_sorted, week_labels=["A"])
 
     def generate_until_time(
         self,
@@ -390,6 +390,6 @@ class WeeklyPlanner:
                     break
 
         if best_plan is None:
-            return PlanResult(plans=[], scores=[])
+            return PlanResult(plans=[], scores=[], week_labels=["A"])
 
-        return PlanResult(plans=[best_plan], scores=[best_score])
+        return PlanResult(plans=[best_plan], scores=[best_score], week_labels=["A"])

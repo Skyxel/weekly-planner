@@ -1,0 +1,51 @@
+{
+  "professor_names": [
+    "Prof. Rossi",
+    "Prof.ssa Bianchi",
+    "Prof. Verdi",
+    "Prof.ssa Neri",
+    "Prof. Galli",
+    "Prof.ssa Conti",
+    "Prof. De Luca",
+    "Prof.ssa Romano",
+    "Prof. Riva",
+    "Prof.ssa Sartori"
+  ],
+  "class_names": [
+    "1A",
+    "1B",
+    "2A",
+    "2B",
+    "3A",
+    "3B",
+    "4A",
+    "4B",
+    "5A",
+    "5B"
+  ],
+  "subject_names": [
+    "Matematica",
+    "Italiano",
+    "Inglese",
+    "Scienze",
+    "Storia e Geografia",
+    "Tecnologia e Arte"
+  ],
+  "day_names": [
+    "Lunedi",
+    "Martedi",
+    "Mercoledi",
+    "Giovedi",
+    "Venerdi"
+  ],
+  "hour_names": [
+    "1a ora",
+    "2a ora",
+    "3a ora",
+    "4a ora",
+    "5a ora",
+    "6a ora",
+    "7a ora",
+    "8a ora"
+  ]
+}
