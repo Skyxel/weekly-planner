@@ -72,6 +72,8 @@ class PlannerRequest(BaseModel):
     # Piano già generato da riutilizzare per i PDF (shape: days x daily_hours x num_classes)
     plan: Optional[List[List[List[int]]]] = None
     plan_week_b: Optional[List[List[List[int]]]] = None
+    subject_plan: Optional[List[List[List[int]]]] = None
+    subject_plan_week_b: Optional[List[List[List[int]]]] = None
     # Flag per indicare i docenti di classe (niente limite 2h/dì con la classe)
     class_teachers: Optional[List[bool]] = None
 
@@ -221,7 +223,18 @@ def get_or_generate_result(req: PlannerRequest, config: PlannerConfig, subject_c
     if subject_ctx and subject_ctx.week_labels:
         labels = subject_ctx.week_labels
 
-    return PlanResult(plans=plans, scores=scores, week_labels=labels or None)
+    subject_plans = []
+    if req.subject_plan is not None:
+        Sp = np.array(req.subject_plan, dtype=int)
+        if Sp.shape == expected_shape:
+            subject_plans.append(Sp)
+    if req.subject_plan_week_b is not None:
+        Spb = np.array(req.subject_plan_week_b, dtype=int)
+        if Spb.shape == expected_shape:
+            subject_plans.append(Spb)
+
+    return PlanResult(plans=plans, scores=scores, week_labels=labels or None,
+                      subject_plans=subject_plans if subject_plans else None)
 
 
 def persist_example_plan(payload: dict):
@@ -371,6 +384,8 @@ async def generate_plan(req: PlannerRequest):
         "non_zero_total": non_zero,
         "using_subject_planner": bool(subject_ctx),
     }
+    if result.subject_plans and len(result.subject_plans) > 0:
+        response["subject_plan"] = result.subject_plans[0].tolist()
     if subject_ctx and len(result.plans) > 1:
         response["plan_week_b"] = result.plans[1].tolist()
         non_zero_b = int((result.plans[1] != 0).sum())
@@ -381,6 +396,8 @@ async def generate_plan(req: PlannerRequest):
                 "message": "Piano vuoto per la settimana B: controlla ore materia/classe e assegnazioni.",
                 "errors": ["Il solver ha restituito tutti zeri per la settimana B."],
             }
+        if result.subject_plans and len(result.subject_plans) > 1:
+            response["subject_plan_week_b"] = result.subject_plans[1].tolist()
     persist_example_plan(
         response
         | {"method": req.method}
@@ -433,7 +450,8 @@ async def classes_pdf(req: PlannerRequest, week_index: int = 0):
 
     plan_index = min(week_index, len(result.plans) - 1)
     week_label = (result.week_labels or ["A"])[plan_index].replace(" ", "_")
-    pdf_bytes = render_classes_pdf(result, config, plan_index=plan_index)
+    subj_names = list(req.subject_names) if req.subject_names else None
+    pdf_bytes = render_classes_pdf(result, config, plan_index=plan_index, subject_names=subj_names)
 
     return Response(
         content=pdf_bytes,
@@ -481,7 +499,8 @@ async def professors_pdf(req: PlannerRequest, week_index: int = 0):
 
     plan_index = min(week_index, len(result.plans) - 1)
     week_label = (result.week_labels or ["A"])[plan_index].replace(" ", "_")
-    pdf_bytes = render_professors_pdf(result, config, plan_index=plan_index)
+    subj_names = list(req.subject_names) if req.subject_names else None
+    pdf_bytes = render_professors_pdf(result, config, plan_index=plan_index, subject_names=subj_names)
 
     return Response(
         content=pdf_bytes,
@@ -522,7 +541,8 @@ async def classes_excel(req: PlannerRequest, week_index: int = 0):
 
     plan_index = min(week_index, len(result.plans) - 1)
     week_label = (result.week_labels or ["A"])[plan_index].replace(" ", "_")
-    excel_bytes = render_classes_excel(result, config, plan_index=plan_index)
+    subj_names = list(req.subject_names) if req.subject_names else None
+    excel_bytes = render_classes_excel(result, config, plan_index=plan_index, subject_names=subj_names)
 
     return Response(
         content=excel_bytes,
@@ -545,7 +565,8 @@ async def professors_excel(req: PlannerRequest, week_index: int = 0):
 
     plan_index = min(week_index, len(result.plans) - 1)
     week_label = (result.week_labels or ["A"])[plan_index].replace(" ", "_")
-    excel_bytes = render_professors_excel(result, config, plan_index=plan_index)
+    subj_names = list(req.subject_names) if req.subject_names else None
+    excel_bytes = render_professors_excel(result, config, plan_index=plan_index, subject_names=subj_names)
 
     return Response(
         content=excel_bytes,

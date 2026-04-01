@@ -1676,3 +1676,17 @@ input::placeholder {
     font-size: 15px;
   }
 }
+
+/* Celle piano con materia e professore */
+.cell-subject {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.cell-prof {
+  display: block;
+  font-size: 0.72em;
+  opacity: 0.75;
+  line-height: 1.3;
+}

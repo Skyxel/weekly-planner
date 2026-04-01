@@ -2264,6 +2264,8 @@ class WeeklyPlannerApp {
         ...appState.lastPayload,
         plan: appState.lastPlanResponse.plan,
         plan_week_b: appState.lastPlanResponse.plan_week_b,
+        subject_plan: appState.lastPlanResponse.subject_plan || null,
+        subject_plan_week_b: appState.lastPlanResponse.subject_plan_week_b || null,
       };
 
       const res = await fetch(`${endpoint}?week_index=${weekIndex}`, {
@@ -3241,10 +3243,10 @@ class WeeklyPlannerApp {
       const labels = Array.isArray(data.week_labels) ? data.week_labels : [];
       const planEntries = [];
       if (data.plan) {
-        planEntries.push({ label: labels[0] || "Settimana A", plan: data.plan });
+        planEntries.push({ label: labels[0] || "Settimana A", plan: data.plan, subjectPlan: data.subject_plan || null });
       }
       if (data.plan_week_b) {
-        planEntries.push({ label: labels[1] || "Settimana B", plan: data.plan_week_b });
+        planEntries.push({ label: labels[1] || "Settimana B", plan: data.plan_week_b, subjectPlan: data.subject_plan_week_b || null });
       }
       if (!planEntries.length) return;
 
@@ -3273,7 +3275,7 @@ class WeeklyPlannerApp {
         return holes;
       }
 
-      function renderSinglePlan(planMatrix, label) {
+      function renderSinglePlan(planMatrix, label, subjectPlan) {
         const profFrag = document.createDocumentFragment();
         const classFrag = document.createDocumentFragment();
         for (let p = 0; p < numProf; p++) {
@@ -3350,12 +3352,16 @@ class WeeklyPlannerApp {
               const classesHere = [];
               for (let c = 0; c < numClass; c++) {
                 if (planMatrix[d][h][c] === p + 1) {
-                  classesHere.push(classNames[c]);
+                  let ctext = classNames[c];
+                  if (subjectPlan && subjectPlan[d] && subjectPlan[d][h] && subjectPlan[d][h][c] > 0) {
+                    const sid = subjectPlan[d][h][c];
+                    const sname = (appState.subjectNames && appState.subjectNames[sid - 1]) ? appState.subjectNames[sid - 1] : ("Mat " + sid);
+                    ctext = classNames[c] + " (" + sname + ")";
+                  }
+                  classesHere.push(ctext);
                 }
               }
-              td.textContent = classesHere.length
-                ? classesHere.join(", ")
-                : "–";
+              td.textContent = classesHere.length ? classesHere.join(", ") : "–";
               row.appendChild(td);
             }
             tbody.appendChild(row);
@@ -3433,7 +3439,14 @@ class WeeklyPlannerApp {
               if (profId === 0) {
                 td.textContent = "–";
               } else {
-                td.textContent = profNames[profId - 1];
+                const pname = profNames[profId - 1];
+                if (subjectPlan && subjectPlan[d] && subjectPlan[d][h] && subjectPlan[d][h][c] > 0) {
+                  const sid = subjectPlan[d][h][c];
+                  const sname = (appState.subjectNames && appState.subjectNames[sid - 1]) ? appState.subjectNames[sid - 1] : ("Mat " + sid);
+                  td.innerHTML = "<span class=\"cell-subject\">" + sname + "</span><span class=\"cell-prof\">" + pname + "</span>";
+                } else {
+                  td.textContent = pname;
+                }
               }
               row.appendChild(td);
             }
@@ -3466,7 +3479,7 @@ class WeeklyPlannerApp {
         classTitle.textContent = weekLabel;
         classSection.appendChild(classTitle);
 
-        const rendered = renderSinglePlan(entry.plan, weekLabel);
+        const rendered = renderSinglePlan(entry.plan, weekLabel, entry.subjectPlan);
         profSection.appendChild(rendered.profFrag);
         classSection.appendChild(rendered.classFrag);
 

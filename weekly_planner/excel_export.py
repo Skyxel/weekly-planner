@@ -115,6 +115,7 @@ def render_classes_excel(
     result: PlanResult,
     config: PlannerConfig,
     plan_index: int = 0,
+    subject_names: Optional[List[str]] = None,
 ) -> bytes:
     """
     Genera un file Excel con una pagina per ogni classe.
@@ -124,6 +125,7 @@ def render_classes_excel(
         raise ValueError("Nessun piano disponibile per generare l'Excel.")
 
     P = result.plans[plan_index]
+    S = result.subject_plans[plan_index] if (result.subject_plans and plan_index < len(result.subject_plans)) else None
     days = config.days
     daily_hours = config.daily_hours
     m = config.num_classes
@@ -145,7 +147,12 @@ def render_classes_excel(
         prof_id = int(P[d, h, c])
         if prof_id == 0:
             return "", False
-        return professor_names[prof_id - 1], True
+        pname = professor_names[prof_id - 1]
+        if S is not None:
+            sid = int(S[d, h, c])
+            if sid > 0 and subject_names and sid - 1 < len(subject_names):
+                return f"{subject_names[sid - 1]}\n{pname}", True
+        return pname, True
 
     wb = openpyxl.Workbook()
     wb.remove(wb.active)  # rimuove il foglio vuoto di default
@@ -178,6 +185,7 @@ def render_professors_excel(
     result: PlanResult,
     config: PlannerConfig,
     plan_index: int = 0,
+    subject_names: Optional[List[str]] = None,
 ) -> bytes:
     """
     Genera un file Excel con una pagina per ogni professore.
@@ -187,6 +195,7 @@ def render_professors_excel(
         raise ValueError("Nessun piano disponibile per generare l'Excel.")
 
     P = result.plans[plan_index]
+    S = result.subject_plans[plan_index] if (result.subject_plans and plan_index < len(result.subject_plans)) else None
     days = config.days
     daily_hours = config.daily_hours
     m = config.num_classes
@@ -206,10 +215,18 @@ def render_professors_excel(
         week_label = result.week_labels[plan_index]
 
     def cell_for_prof(P, d, h, p):
-        classes_here = [class_names[c] for c in range(m) if int(P[d, h, c]) == p + 1]
+        classes_here = []
+        for c in range(m):
+            if int(P[d, h, c]) == p + 1:
+                cname = class_names[c]
+                if S is not None:
+                    sid = int(S[d, h, c])
+                    if sid > 0 and subject_names and sid - 1 < len(subject_names):
+                        cname = f"{cname}\n{subject_names[sid - 1]}"
+                classes_here.append(cname)
         if not classes_here:
             return "", False
-        return ", ".join(classes_here), True
+        return "\n".join(classes_here), True
 
     wb = openpyxl.Workbook()
     wb.remove(wb.active)

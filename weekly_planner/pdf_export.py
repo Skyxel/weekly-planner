@@ -26,6 +26,7 @@ def render_classes_pdf(
     result: PlanResult,
     config: PlannerConfig,
     plan_index: int = 0,
+    subject_names: Optional[List[str]] = None,
 ) -> bytes:
     """
     Genera un PDF con i piani orari per ogni classe.
@@ -36,6 +37,7 @@ def render_classes_pdf(
         raise ValueError("Nessun piano disponibile per generare il PDF.")
 
     P = result.plans[plan_index]
+    S = result.subject_plans[plan_index] if (result.subject_plans and plan_index < len(result.subject_plans)) else None
     days = config.days
     daily_hours = config.daily_hours
     m = config.num_classes
@@ -62,7 +64,15 @@ def render_classes_pdf(
                 if prof_id == 0:
                     row.append("-")
                 else:
-                    row.append(professor_names[int(prof_id) - 1])
+                    pname = professor_names[int(prof_id) - 1]
+                    if S is not None:
+                        sid = int(S[d, h, c])
+                        if sid > 0 and subject_names and sid - 1 < len(subject_names):
+                            row.append(f"{subject_names[sid - 1]}\n{pname}")
+                        else:
+                            row.append(pname)
+                    else:
+                        row.append(pname)
             data.append(row)
 
         col_labels = DAY_LABELS[:days]
@@ -101,6 +111,7 @@ def render_professors_pdf(
     result: PlanResult,
     config: PlannerConfig,
     plan_index: int = 0,
+    subject_names: Optional[List[str]] = None,
 ) -> bytes:
     """
     Genera un PDF con i piani orari per ogni professore.
@@ -112,6 +123,7 @@ def render_professors_pdf(
         raise ValueError("Nessun piano disponibile per generare il PDF.")
 
     P = result.plans[plan_index]
+    S = result.subject_plans[plan_index] if (result.subject_plans and plan_index < len(result.subject_plans)) else None
     days = config.days
     daily_hours = config.daily_hours
     m = config.num_classes
@@ -138,7 +150,12 @@ def render_professors_pdf(
                 classes_here = []
                 for c in range(m):
                     if P[d, h, c] == p + 1:
-                        classes_here.append(class_names[c])
+                        cname = class_names[c]
+                        if S is not None:
+                            sid = int(S[d, h, c])
+                            if sid > 0 and subject_names and sid - 1 < len(subject_names):
+                                cname = f"{cname}\n{subject_names[sid - 1]}"
+                        classes_here.append(cname)
                 if not classes_here:
                     row.append("-")
                 else:

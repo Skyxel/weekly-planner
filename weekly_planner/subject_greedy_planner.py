@@ -71,14 +71,15 @@ class SubjectGreedyPlanner:
         required: np.ndarray,  # shape (classes, subjects)
         max_attempts: int = 50,
         placement_tries: int = 500,
-    ) -> Optional[np.ndarray]:
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Tenta di generare un piano per una settimana.
-        Ritorna l'array del piano o None se fallisce dopo max_attempts.
+        Ritorna (plan, subject_plan) o (None, None) se fallisce dopo max_attempts.
         """
-        
+
         for attempt in range(max_attempts):
             plan = np.zeros((self.days, self.daily_hours, self.num_classes), dtype=int)
+            subject_plan = np.zeros((self.days, self.daily_hours, self.num_classes), dtype=int)
             
             # Crea lista di assegnamenti (class, subject, ore, difficoltà)
             tasks = []
@@ -199,7 +200,8 @@ class SubjectGreedyPlanner:
                     for k in range(block_size):
                         h = start + k
                         plan[d, h, c] = prof + 1
-                    
+                        subject_plan[d, h, c] = s + 1
+
                     day_subject_load[d, c, s] += block_size
                     hours_placed += block_size
                 
@@ -211,25 +213,27 @@ class SubjectGreedyPlanner:
                 teachers_for_cs[(c, s)] = prof
             
             if success:
-                return plan
-        
-        return None
+                return plan, subject_plan
+
+        return None, None
 
     def generate(self, time_limit_sec: float = 5.0) -> PlanResult:
         """
         Genera piani per tutte le settimane.
         """
         plans: List[np.ndarray] = []
+        subject_plans: List[np.ndarray] = []
         scores: List[float] = []
 
         for week_idx, required in enumerate(self.ctx.required_hours):
-            plan = self._try_generate_week(required, max_attempts=50, placement_tries=500)
-            
+            plan, subj_plan = self._try_generate_week(required, max_attempts=50, placement_tries=500)
+
             if plan is None:
                 # Se fallisce una settimana, il piano intero è fallito
                 return PlanResult(plans=[], scores=[], week_labels=self.ctx.week_labels)
-            
+
             plans.append(plan)
+            subject_plans.append(subj_plan)
             scores.append(self._score_plan(plan))
 
-        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels)
+        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels, subject_plans=subject_plans)

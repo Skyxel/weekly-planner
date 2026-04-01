@@ -214,25 +214,27 @@ class SubjectMIPPlanner:
 
     def solve(self, time_limit_sec: int | None = 60) -> PlanResult:
         plans: List[np.ndarray] = []
+        subject_plans: List[np.ndarray] = []
         scores: List[float] = []
 
         for week_idx, label in enumerate(self.ctx.week_labels):
-            plan, score = self._solve_single_week(
+            plan, subj_plan, score = self._solve_single_week(
                 self.ctx.required_hours[week_idx],
                 time_limit_sec=time_limit_sec,
             )
             if plan is None:
                 return PlanResult(plans=[], scores=[], week_labels=self.ctx.week_labels)
             plans.append(plan)
+            subject_plans.append(subj_plan)
             scores.append(score)
 
-        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels)
+        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels, subject_plans=subject_plans)
 
     def _solve_single_week(
         self,
         required: np.ndarray,  # shape (classes, subjects)
         time_limit_sec: int | None = 60,
-    ) -> Tuple[Optional[np.ndarray], float]:
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], float]:
         D = self.days
         H = self.daily_hours
         C = self.num_classes
@@ -493,25 +495,29 @@ class SubjectMIPPlanner:
 
         status = pulp.LpStatus[prob.status]
         if status not in ("Optimal", "Feasible"):
-            return None, float("inf")
+            return None, None, float("inf")
 
         Pmat = np.zeros((D, H, C), dtype=int)
+        Smat = np.zeros((D, H, C), dtype=int)
         for d in range(D):
             for h in range(H):
                 for c in range(C):
                     prof_found = 0
+                    subj_found = 0
                     for s in range(S):
                         for p in range(P):
                             val = pulp.value(x[(d, h, c, s, p)])
                             if val is not None and val > 0.5:
                                 prof_found = p + 1
+                                subj_found = s + 1
                                 break
                         if prof_found:
                             break
                     Pmat[d, h, c] = prof_found
+                    Smat[d, h, c] = subj_found
 
         obj_val = float(pulp.value(prob.objective))
-        return Pmat, obj_val
+        return Pmat, Smat, obj_val
 
 
 class SubjectRandomPlanner:
@@ -621,6 +627,7 @@ class SubjectRandomPlanner:
     def _place_block(
         self,
         plan: np.ndarray,
+        subject_plan: np.ndarray,
         block: dict,
         prof: int,
         day_subject_load: np.ndarray,
@@ -671,18 +678,21 @@ class SubjectRandomPlanner:
             for k in range(size):
                 h = start + k
                 plan[d, h, c] = prof + 1
+                subject_plan[d, h, c] = block["subject"] + 1
                 day_subject_load[d, c, s] += 1
             return True
         return False
 
     def generate(self, time_limit_sec: float = 10.0) -> PlanResult:
         plans: List[np.ndarray] = []
+        subject_plans: List[np.ndarray] = []
         scores: List[float] = []
         remaining_caps = np.array(self.ctx.prof_subject_caps, dtype=int)
         teachers_for_cs: dict[Tuple[int, int], int] = {}
 
         for week_idx, required in enumerate(self.ctx.required_hours):
             plan = np.zeros((self.days, self.daily_hours, self.num_classes), dtype=int)
+            subject_plan = np.zeros((self.days, self.daily_hours, self.num_classes), dtype=int)
             day_subject_load = np.zeros((self.days, self.num_classes, self.num_subjects), dtype=int)
             blocks = self._build_blocks_for_week(required)
             success = True
@@ -691,7 +701,7 @@ class SubjectRandomPlanner:
                 if prof is None:
                     success = False
                     break
-                if not self._place_block(plan, blk, prof, day_subject_load):
+                if not self._place_block(plan, subject_plan, blk, prof, day_subject_load):
                     success = False
                     break
                 remaining_caps[prof, blk["subject"]] -= blk["size"]
@@ -699,6 +709,7 @@ class SubjectRandomPlanner:
             if not success:
                 return PlanResult(plans=[], scores=[], week_labels=self.ctx.week_labels)
             plans.append(plan)
+            subject_plans.append(subject_plan)
             scores.append(self._score_plan(plan))
 
-        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels)
+        return PlanResult(plans=plans, scores=scores, week_labels=self.ctx.week_labels, subject_plans=subject_plans)
